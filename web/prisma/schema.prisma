@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String
+  password  String
+  phone     String?
+  avatar    Bytes?
+  role      Role       @default(FARMER)
+  createdAt DateTime   @default(now())
+  soildata  SoilData[]
+  stocks    Stock[]
+  workers   Worker[]
+}
+
+model Stock {
+  id           String   @id @default(uuid())
+  name         String
+  quantity     Int
+  location     String
+  cost         Float
+  userId       String
+  createdAt    DateTime @default(now())
+  sellingPrice Float
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Worker {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  farm      String
+  cost      Float
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SoilData {
+  id             String   @id @default(cuid())
+  userId         String
+  createdAt      DateTime @default(now())
+  B              Float
+  Cu             Float
+  EC             Float
+  Fe             Float
+  K              Float
+  Mn             Float
+  N              Float
+  OC             Float
+  P              Float
+  S              Float
+  Zn             Float
+  confidence     Float
+  fertilityClass String
+  pH             Float
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+enum Role {
+  FARMER
+  WORKER
+  ADMIN
+}
