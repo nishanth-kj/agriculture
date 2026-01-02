@@ -143,32 +143,25 @@ agri_backend/
 │   ├── urls.py                     # Root URL configurations
 │   ├── wsgi.py                     # WSGI configuration for deployment
 │   └── asgi.py                     # ASGI configuration for async support
-├── apps/
-│   ├── crop_prediction/
-│   │   ├── models.py               # Data models for crop prediction
-│   │   ├── views.py                # API views for crop prediction
-│   │   ├── serializers.py          # Serializers for handling JSON data
-│   │   └── urls.py                 # URLs specific to crop prediction
-│   ├── soil_health/
-│   │   ├── models.py               # Data models for soil health
-│   │   ├── views.py                # API views for soil health
-│   │   ├── serializers.py          # Serializers for soil health
-│   │   └── urls.py                 # URLs specific to soil health
-│   ├── pest_prediction/
-│   │   ├── models.py               # Data models for pest prediction
-│   │   ├── views.py                # API views for pest prediction
-│   │   ├── serializers.py          # Serializers for pest prediction
-│   │   └── urls.py                 # URLs specific to pest prediction
-│   ├── real_time_monitoring/
-│   │   ├── models.py               # Data models for climate and price history
-│   │   ├── views.py                # API views for real-time monitoring
-│   │   ├── serializers.py          # Serializers for real-time data
-│   │   └── urls.py                 # URLs for real-time monitoring
-│   ├── managing/
-│   │   ├── models.py               # Data models for camera, stocks, and labor management
-│   │   ├── views.py                # API views for managing operations
-│   │   ├── serializers.py          # Serializers for managing data
-│   │   └── urls.py                 # URLs for managing operations
+├── crop_yield/                 # Crop yield prediction app
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+├── soil_fertility/             # Soil fertility app
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+├── crop_rf/                    # Crop Random Forest app
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+├── training/                   # Model training app
+│   └── TrainFineModel.py
+├── predictor/                  # Predictor app
+│   └── ...
 ├── manage.py                       # Django management script
 ├── .env                            # Environment variables (e.g., SECRET_KEY, DB settings)
 └── requirements.txt                # Backend dependencies

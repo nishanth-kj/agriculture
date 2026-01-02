@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/app
+      - /app/__pycache__
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./api/.env
+    environment:
+      - DEBUG=1
+    # command: python manage.py runserver 0.0.0.0:8000 # Already in Dockerfile but can override here
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: runner # Build for production by default, or change to development if needed
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api
+    # For development with hot reload, you might want to override command and volumes:
+    # volumes:
+    #   - ./web:/app
+    #   - /app/node_modules
+    # command: npm run dev
