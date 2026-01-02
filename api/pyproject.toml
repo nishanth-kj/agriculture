@@ -2,7 +2,7 @@
 name = "agri-backend"
 version = "0.1.0"
 description = "Agricultural prediction and management API"
-readme = "README.md"
+#readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "Django>=5.1.2",
