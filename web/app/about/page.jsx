@@ -15,7 +15,7 @@ export default function AboutPage() {
     const teamMembers = [
       {
         name: "Nishanth K J",
-        role: "Lead, Full Stack Developer & AI/ML Specialist",
+        role: "Lead, Full Stack Developer & AI/ML",
         github: "https://github.com/nishanth-kj",
       },
       {
@@ -30,7 +30,7 @@ export default function AboutPage() {
       },
       {
         name: "Skanda P M",
-        role: "UI/UX,  Graphic Designer, QA & AI",
+        role: "UI/UX,  Graphic Designer, QA & AI/ML",
         github: "https://github.com/Sk2003pm",
       },
     ];
