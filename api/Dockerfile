@@ -46,4 +46,4 @@ EXPOSE 8000
 # Command to run the Django server
 # Use gunicorn for production as it binds to the port quickly
 # Use --timeout 120 as model loading can still be slow on first request
-CMD ["sh", "-c", "gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 120"]
+CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 120"]
