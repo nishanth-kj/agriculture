@@ -11,6 +11,10 @@ ENV USE_GPU=false
 ENV UV_HTTP_TIMEOUT=1200
 # Suppress warning about hardlinks during build
 ENV UV_LINK_MODE=copy
+# Set HuggingFace cache directory
+ENV HF_HOME=/app/.cache/huggingface
+# Compile python bytecode for faster startup
+ENV UV_COMPILE_BYTECODE=1
 
 # Set working directory
 WORKDIR /app
@@ -28,7 +32,9 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Copy the entire app code into the container
 COPY . .
 
-# Collect static files (optional, commenting out as per original)
+# Pre-download models to avoid timeouts on Render
+RUN uv run python download_models.py
+
 # Collect static files (optional, commenting out as per original)
 RUN uv run python manage.py collectstatic --noinput
 
@@ -37,4 +43,5 @@ EXPOSE 8000
 
 # Command to run the Django server
 # Use sh -c to expand environment variables at runtime
-CMD ["sh", "-c", "uv run python manage.py runserver 0.0.0.0:${PORT:-8000}"]
+# Use --no-sync to prevent uv from checking/syncing at runtime
+CMD ["sh", "-c", "uv run --no-sync python manage.py runserver 0.0.0.0:${PORT:-8000}"]
