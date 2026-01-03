@@ -156,7 +156,7 @@ export default function DashboardPage() {
 
     return (
         <div className="max-w-screen-xl mx-auto space-y-6 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {/* 📍 Location & Weather Details Card */}
                 <Card className="p-6 bg-white shadow">
                     <h2 className="text-lg font-semibold mb-3">🌤️ Weather & Location</h2>

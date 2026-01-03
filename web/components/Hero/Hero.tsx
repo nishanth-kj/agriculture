@@ -5,7 +5,7 @@ import IMG from "@/assets/famer.png"; // Ensure this path is correct
 
 export default function HeroPage() {
   return (
-    <section className="relative bg-green-50 min-h-[calc(100vh-4rem)] flex items-center">
+    <section className="relative bg-green-50 min-h-[calc(100vh-64px)] flex items-center">
       {/* Container with Grid Layout */}
       <div className="container mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 items-center justify-center py-12 lg:py-0">
         {/* Image Section */}

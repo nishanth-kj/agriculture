@@ -32,10 +32,10 @@ export default function DashboardLayout({
     return (
         <div className="flex min-h-screen bg-[#f8fafc]">
             {/* Sidebar Container */}
-            <div className="hidden md:flex flex-col h-screen sticky top-0 py-5 pl-5">
+            <div className="hidden md:flex flex-col fixed top-16 left-0 h-[calc(100vh-64px)] py-5 pl-5 z-20">
                 <aside className={cn(
-                    "bg-white border border-slate-200 rounded-[32px] flex flex-col transition-all duration-500 ease-in-out relative z-20 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden",
-                    "h-[calc(100vh-120px)]", 
+                    "bg-white border border-slate-200 rounded-[32px] flex flex-col transition-all duration-500 ease-in-out relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden",
+                    "h-[calc(100vh-140px)]",
                     isCollapsed ? "w-[76px]" : "w-[260px]"
                 )}>
                     {/* Toggle Button */}
@@ -128,9 +128,14 @@ export default function DashboardLayout({
             </div>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-auto flex flex-col pt-4 md:pt-0">
+            <main
+                className={cn(
+                    "flex-1 overflow-auto flex flex-col pt-4 md:pt-0 transition-all duration-500 ease-in-out",
+                    isCollapsed ? "md:ml-[116px]" : "md:ml-[300px]" // Dynamic left margin: (20px pad + width + 20px gap)
+                )}
+            >
                 {/* Mobile Navigation Bar */}
-                <div className="md:hidden bg-white border-b border-slate-100 px-6 py-2 flex items-center justify-between sticky top-0 z-10">
+                <div className="md:hidden bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-2 flex items-center justify-between sticky top-16 z-10 transition-all duration-300">
                     <div className="flex items-center gap-2">
                         <Leaf className="w-5 h-5 text-emerald-600" />
                         <span className="text-slate-900 font-black text-lg tracking-tight truncate max-w-[150px]">

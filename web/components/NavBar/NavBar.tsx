@@ -31,7 +31,7 @@ export default function ResponsiveNavBar() {
   }
 
   return (
-    <nav className="bg-transparent shadow-md font-poppins">
+    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm font-poppins transition-all duration-300">
       <div className="container mx-auto px-6 lg:px-12 flex items-center h-16">
         {/* Left Section: Logo */}
         <div className="flex-1 md:flex-initial md:w-1/4 flex items-center">

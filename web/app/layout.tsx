@@ -34,7 +34,9 @@ export default function RootLayout({
         <Providers>
           <Toaster position="top-right" />
           <NavBar />
-          {children}
+          <div className="pt-16">
+            {children}
+          </div>
           <ChatBotWidget />
         </Providers>
       </body>
