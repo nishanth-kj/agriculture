@@ -1,8 +1,10 @@
-import pandas as pd
+# Defer heavy imports
+# import pandas as pd
 from django.shortcuts import render
 from django.conf import settings
 import os
 def index(request):
+    import pandas as pd
     csv_path = os.path.join(settings.BASE_DIR, 'crop_yield', 'static', 'crop_yield', 'Datasets', 'crop_data.csv')
     df = pd.read_csv(csv_path)
     df.columns = df.columns.str.strip().str.lower()
@@ -54,7 +56,7 @@ from rest_framework.views import APIView
 from utils.response import ApiResponse
 from rest_framework import status
 from crop_yield.serializers import CropPredictionSerializer
-import os, pickle, numpy as np
+import os, pickle
 from utils.models import ModelService
 
 # === Load model and tools
@@ -95,6 +97,7 @@ class CropYieldAPIView(APIView):
                               data["area"], data["rainfall"],
                               data["fertilizer"], data["pesticide"]]
 
+                import numpy as np
                 scaled = scaler.transform([input_data])
                 sequence_input = np.expand_dims([scaled[0]] * 3, axis=0)
                 prediction = model.predict(sequence_input)[0][0]

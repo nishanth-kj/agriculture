@@ -1,6 +1,5 @@
 import os
-import torch
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+# Avoid top-level imports of heavy ML libraries to ensure fast container startup
 
 # Lazily loaded model and tokenizer
 _tokenizer = None
@@ -8,6 +7,9 @@ _model = None
 
 def get_gpt_model():
     global _tokenizer, _model
+    import torch
+    from transformers import GPT2LMHeadModel, GPT2Tokenizer
+    
     if _model is None:
         # Check environment for GPU usage
         use_gpu = os.getenv('USE_GPU', 'false').lower() == 'true'
@@ -19,6 +21,7 @@ def get_gpt_model():
     return _tokenizer, _model
 
 def generate_yield_prediction(prompt, max_length=300):
+    import torch
     tokenizer, model = get_gpt_model()
     use_gpu = os.getenv('USE_GPU', 'false').lower() == 'true'
     device = 'cuda' if use_gpu and torch.cuda.is_available() else 'cpu'

@@ -35,7 +35,8 @@ from rest_framework import status
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from .run import run
+# Avoid top-level imports of heavy libraries
+# from .run import run
 import json
 import re
 
@@ -87,6 +88,7 @@ class CropPredictionAPIView(APIView):
             )
 
         try:
+            from .run import run
             #response_text = generate_yield_prediction(prompt)
             response_text = run(prompt) 
             print("\n=== Prompt Sent to Gemini ===\n", prompt)
@@ -136,6 +138,7 @@ class PestPredictionAPIView(APIView):
         
         try:
              # Using the same run function or direct model access
+             from .run import run
              response_text = run(prompt)
              print("\n=== Pest Prompt Sent ===\n", prompt)
              print("\n=== Gemini Response ===\n", response_text)

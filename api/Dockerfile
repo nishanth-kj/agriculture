@@ -43,7 +43,12 @@ RUN python manage.py collectstatic --noinput
 # Expose the port that Django will run on
 EXPOSE 8000
 
+# Optimization for Render: Prevent OOM and ensure port binds quickly
+ENV TF_CPP_MIN_LOG_LEVEL=3
+ENV TF_ENABLE_ONEDNN_OPTS=0
+ENV MALLOC_TRIM_THRESHOLD_=100000
+
 # Command to run the Django server
 # Use gunicorn for production as it binds to the port quickly
-# Use --timeout 120 as model loading can still be slow on first request
-CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 120"]
+# Use --timeout 300 as model loading can still be slow on first request
+CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 300"]

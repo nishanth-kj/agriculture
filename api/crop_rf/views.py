@@ -3,22 +3,29 @@ from django.shortcuts import render
 # Create your views here.
 import os
 import pickle
-import numpy as np
+# Defer heavy imports
+# import numpy as np
 from django.shortcuts import render
 
 # Set the base path for model files
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, 'crop_rf', 'static', 'models')
 
-# Load the models
-try:
-    nb_model = pickle.load(open(os.path.join(MODEL_PATH, 'naive_bayes_model.pkl'), 'rb'))
-    rf_model = pickle.load(open(os.path.join(MODEL_PATH, 'random_forest_model.pkl'), 'rb'))
-    print("✅ Models loaded successfully.")
-except Exception as e:
-    print("❌ Error loading models:", e)
-    nb_model = None
-    rf_model = None
+# Lazily loaded models
+_nb_model = None
+_rf_model = None
+
+def get_rf_models():
+    global _nb_model, _rf_model
+    if _nb_model is None:
+        print(f"Lazy loading crop_rf models from {MODEL_PATH}...")
+        try:
+            _nb_model = pickle.load(open(os.path.join(MODEL_PATH, 'naive_bayes_model.pkl'), 'rb'))
+            _rf_model = pickle.load(open(os.path.join(MODEL_PATH, 'random_forest_model.pkl'), 'rb'))
+            print("✅ Models loaded successfully.")
+        except Exception as e:
+            print("❌ Error loading models:", e)
+    return _nb_model, _rf_model
 
 # Crop and Fertilizer label mappings
 crop_dict = {
@@ -40,6 +47,10 @@ def index(request):
     
     if request.method == 'POST':
         try:
+            nb_model, rf_model = get_rf_models()
+            if not nb_model or not rf_model:
+                 raise Exception("Models not loaded")
+                 
             N = float(request.POST['N'])
             P = float(request.POST['P'])
             K = float(request.POST['K'])
@@ -48,6 +59,7 @@ def index(request):
             ph = float(request.POST['ph'])
             rainfall = float(request.POST['rainfall'])
 
+            import numpy as np
             crop_features = np.array([[N, P, K, ph]])
             fertilizer_features = np.array([[N, P, K, ph]])
 
@@ -79,6 +91,7 @@ class CropFertilizerPredictAPI(APIView):
                 nb_model = ModelService.get_model('nb_model', os.path.join(MODEL_PATH, 'naive_bayes_model.pkl'))
                 rf_model = ModelService.get_model('rf_model', os.path.join(MODEL_PATH, 'random_forest_model.pkl'))
                 
+                import numpy as np
                 features = np.array([[data['N'], data['P'], data['K'], data['ph']]])
                 crop_pred = nb_model.predict(features)[0]
                 fertilizer_pred = rf_model.predict(features)[0]

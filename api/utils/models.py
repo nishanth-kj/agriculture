@@ -1,6 +1,6 @@
 import os
 import pickle
-import tensorflow as tf
+# Moved tensorflow import inside ModelService.get_model to speed up startup
 from django.conf import settings
 
 # Check environment for GPU usage
@@ -16,6 +16,9 @@ class ModelService:
         """
         Lazy load models to avoid startup overhead and global scope pollution.
         """
+        if loader_type == 'keras':
+            import tensorflow as tf
+        
         if key not in cls._models:
             print(f"Loading model: {key} from {path}")
             try:
