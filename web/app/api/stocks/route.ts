@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
   try {
     // Retrieve the token from cookies
     const token = req.cookies.get('token')?.value;
-    console.log('Received token:', token); // Log the received token
+
 
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     // Decode the token to get userId
     const decoded = verifyToken(token) as JwtPayload;
-    console.log('Decoded token:', decoded); // Log the decoded token
+
 
     // Check if the token contains userId
     if (!decoded?.id) {
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Log the userId for debugging
-    console.log('User ID from decoded token:', decoded.id);
+
 
     // Fetch stocks associated with the userId
     const stocks = await prisma.stock.findMany({
@@ -72,11 +72,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    console.log('Fetched stocks:', stocks); // Log the fetched stocks
+
 
     // Check if no stocks were found for this user
     if (stocks.length === 0) {
-      console.log('No stocks found for user with userId:', decoded.id);
+
     }
 
     return NextResponse.json(stocks); // Return the fetched stocks

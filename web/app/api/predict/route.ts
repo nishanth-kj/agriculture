@@ -87,7 +87,7 @@ Format:
     })
 
     const rawText = await result.response.text()
-    console.log('🧠 Gemini raw output:', rawText)
+
 
     const jsonOnly = extractJSONBlock(rawText)
     const predictionResponse = parsePestResponse(jsonOnly)
@@ -108,44 +108,44 @@ Format:
     }, { status: 500 })
   }
 
-function extractJSONBlock(text: string): string {
-  const match = text.match(/\{[\s\S]*?\}/)
-  return match ? match[0] : ''
-}
+  function extractJSONBlock(text: string): string {
+    const match = text.match(/\{[\s\S]*?\}/)
+    return match ? match[0] : ''
+  }
 
-function parsePestResponse(text: string): Omit<PestPredictionResponse, 'relatedPests'> {
-  try {
-    return JSON.parse(text)
-  } catch {
-    return {
-      prediction: 'Unknown Pest',
-      confidenceLevel: 'Low',
-      preventionMethods: ['No clear prevention available.'],
-      treatmentOptions: ['Try contacting a local agri expert.'],
+  function parsePestResponse(text: string): Omit<PestPredictionResponse, 'relatedPests'> {
+    try {
+      return JSON.parse(text)
+    } catch {
+      return {
+        prediction: 'Unknown Pest',
+        confidenceLevel: 'Low',
+        preventionMethods: ['No clear prevention available.'],
+        treatmentOptions: ['Try contacting a local agri expert.'],
+      }
     }
   }
-}
 
-async function generateRelatedPests(cropType: string, location: string): Promise<string[]> {
-  try {
-    const prompt = `
+  async function generateRelatedPests(cropType: string, location: string): Promise<string[]> {
+    try {
+      const prompt = `
 List 3-5 common pests for ${cropType} in ${location}. Respond as a JSON array.
 
 Example: ["Brown Plant Hopper", "Rice Stem Borer"]
     `.trim()
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.5,
-        maxOutputTokens: 150,
-      }
-    })
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.5,
+          maxOutputTokens: 150,
+        }
+      })
 
-    const response = await result.response.text()
-    return JSON.parse(response)
-  } catch {
-    return []
+      const response = await result.response.text()
+      return JSON.parse(response)
+    } catch {
+      return []
+    }
   }
-}
 }

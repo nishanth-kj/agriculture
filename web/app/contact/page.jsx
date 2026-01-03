@@ -20,11 +20,11 @@ export default function ContactPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission, e.g., send the form data to your server or API
-    console.log("Form submitted", formData);
+
   };
 
   return (
-    <section className="relative bg-green-50 h-auto py-12">
+    <section className="relative bg-green-50 min-h-screen py-12 flex items-center justify-center">
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-green-200 opacity-20 z-0"></div>
 

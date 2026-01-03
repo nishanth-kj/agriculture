@@ -22,7 +22,7 @@ interface ErrorResponse {
 
 // Initialize Gemini AI with safety settings
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model = genAI.getGenerativeModel({ 
+const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
   safetySettings: [
     {
@@ -39,7 +39,7 @@ const model = genAI.getGenerativeModel({
 export async function POST(req: NextRequest): Promise<NextResponse<ChatResponse | ErrorResponse>> {
   try {
     const body: ChatRequest = await req.json()
-    console.log('📥 Incoming /api/chat request:', JSON.stringify(body, null, 2))
+
 
     const { message, soilData, userName, location, cropType } = body
 
@@ -114,21 +114,21 @@ export async function POST(req: NextRequest): Promise<NextResponse<ChatResponse 
     // Generate related topics
     const relatedTopics = await generateRelatedTopics(message)
 
-    console.log('✅ Generated response:', text)
 
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       response: text,
       ...(relatedTopics.length > 0 && { relatedTopics })
     })
 
   } catch (error: unknown) {
     console.error('❌ Chat API Error:', error)
-    
+
     const userFriendlyError = "Sorry, I'm having trouble answering right now. 🌧️ Please try again later."
     const errorDetails = error instanceof Error ? error.message : 'Unknown error'
-    
+
     return NextResponse.json(
-      { 
+      {
         error: userFriendlyError,
         ...(process.env.NODE_ENV === 'development' && { details: errorDetails })
       },
@@ -148,7 +148,7 @@ async function generateRelatedTopics(question: string): Promise<string[]> {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-    
+
     const prompt = `
     Based on this agricultural question: "${question}"
     Suggest 3 related topics farmers might want to know about.

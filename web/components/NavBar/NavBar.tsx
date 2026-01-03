@@ -8,12 +8,13 @@ import {
   FaBars,
   FaTimes,
   FaHome,
-  FaUsers,
   FaEnvelope,
   FaInfoCircle,
-  FaCogs,
+  FaSun,
+  FaMoon,
 } from 'react-icons/fa'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useTheme } from 'next-themes'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Popover,
   PopoverTrigger,
@@ -24,6 +25,7 @@ import { Button } from '@/components/ui/button'
 export default function ResponsiveNavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user, logout } = useAuth()
+  const { setTheme, theme } = useTheme()
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -31,28 +33,28 @@ export default function ResponsiveNavBar() {
   }
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm font-poppins transition-all duration-300">
+    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm font-poppins transition-all duration-300 dark:bg-gray-900/80 dark:border-b dark:border-gray-800">
       <div className="container mx-auto px-6 lg:px-12 flex items-center h-16">
         {/* Left Section: Logo */}
         <div className="flex-1 md:flex-initial md:w-1/4 flex items-center">
-          <div className="text-xl font-bold text-black tracking-tight whitespace-nowrap">Neuro Kodes</div>
+          <div className="text-xl font-bold text-black dark:text-white tracking-tight whitespace-nowrap">Neuro Kodes</div>
         </div>
 
         {/* Center Section: Navigation Links (Desktop) */}
         <div className="hidden md:flex flex-1 justify-center items-center">
-          <ul className="flex space-x-8 text-sm font-medium text-black">
+          <ul className="flex space-x-8 text-sm font-medium text-black dark:text-gray-200">
             <li>
-              <Link href="/" className="flex items-center hover:text-blue-600 transition-colors">
+              <Link href="/" className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 <FaHome className="mr-2" /> Home
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="flex items-center hover:text-blue-600 transition-colors">
+              <Link href="/contact" className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 <FaEnvelope className="mr-2" /> Contact
               </Link>
             </li>
             <li>
-              <Link href="/about" className="flex items-center hover:text-blue-600 transition-colors">
+              <Link href="/about" className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 <FaInfoCircle className="mr-2" /> About
               </Link>
             </li>
@@ -62,6 +64,15 @@ export default function ResponsiveNavBar() {
         {/* Right Section: Auth/User (Desktop) + Hamburger (Mobile) */}
         <div className="flex-1 md:flex-initial md:w-1/4 flex items-center justify-end">
           <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle Theme"
+            >
+              <FaSun className="h-5 w-5 text-yellow-500 hidden dark:block" />
+              <FaMoon className="h-5 w-5 text-gray-700 dark:text-gray-300 block dark:hidden" />
+              <span className="sr-only">Toggle theme</span>
+            </button>
             {user ? (
               <Popover>
                 <PopoverTrigger asChild>
@@ -72,29 +83,28 @@ export default function ResponsiveNavBar() {
                   </Avatar>
                 </PopoverTrigger>
                 <PopoverContent className="w-56 p-2 mt-2" align="end">
-                  {/* ... same popover content ... */}
-                  <div className="p-3 border-b border-gray-100">
-                    <div className="font-bold text-gray-900 truncate">{user.name}</div>
-                    <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                  <div className="p-3 border-b border-gray-100 dark:border-gray-700">
+                    <div className="font-bold text-gray-900 dark:text-gray-100 truncate">{user.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</div>
                   </div>
                   <div className="p-1 space-y-1 mt-1">
                     <button
                       onClick={() => router.push('/profile')}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
                     >
                       Profile Settings
                     </button>
                     <button
                       onClick={() => router.push('/dashboard')}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
                     >
                       Dashboard
                     </button>
                   </div>
-                  <div className="p-1 mt-1 border-t border-gray-100">
+                  <div className="p-1 mt-1 border-t border-gray-100 dark:border-gray-700">
                     <Button
                       variant="ghost"
-                      className="w-full justify-start text-sm text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="w-full justify-start text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                       onClick={handleLogout}
                     >
                       Logout
@@ -106,7 +116,7 @@ export default function ResponsiveNavBar() {
               <div className="flex items-center space-x-3">
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-sm font-medium text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 >
                   Login
                 </Link>
@@ -120,11 +130,18 @@ export default function ResponsiveNavBar() {
             )}
           </div>
 
-          {/* Mobile Hamburger */}
-          <div className="md:hidden">
+          {/* Mobile Right Section */}
+          <div className="md:hidden flex items-center space-x-4">
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <FaSun className="h-5 w-5 text-yellow-500 hidden dark:block" />
+              <FaMoon className="h-5 w-5 text-gray-700 dark:text-gray-300 block dark:hidden" />
+            </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-gray-600 hover:text-blue-600 transition-colors focus:outline-none"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none"
             >
               {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
@@ -134,55 +151,55 @@ export default function ResponsiveNavBar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-gray-100 shadow-md">
+        <div className="md:hidden bg-gray-100 dark:bg-gray-900 shadow-md">
           <div className="px-6 py-6 space-y-6">
             {/* User Profile Section in Mobile */}
             {user && (
-              <div className="flex items-center space-x-4 p-3 border-b border-gray-300">
+              <div className="flex items-center space-x-4 p-3 border-b border-gray-300 dark:border-gray-700">
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-blue-600 text-white">
                     {user.name ? user.name[0] : 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-black truncate">{user.name}</div>
-                  <div className="text-xs text-gray-600 truncate">{user.email}</div>
+                  <div className="font-semibold text-black dark:text-white truncate">{user.name}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</div>
                 </div>
               </div>
             )}
 
             {/* Navigation Links */}
-            <ul className="space-y-4 text-black">
+            <ul className="space-y-4 text-black dark:text-gray-200">
               <li>
-                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 transition-colors">
+                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <FaHome className="mr-3" /> Home
                 </Link>
               </li>
               <li>
-                <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 transition-colors">
+                <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <FaEnvelope className="mr-3" /> Contact
                 </Link>
               </li>
               <li>
-                <Link href="/about" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 transition-colors">
+                <Link href="/about" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   <FaInfoCircle className="mr-3" /> About
                 </Link>
               </li>
             </ul>
 
             {/* User Actions / Auth */}
-            <div className="pt-4 border-t border-gray-300 flex flex-col space-y-4">
+            <div className="pt-4 border-t border-gray-300 dark:border-gray-700 flex flex-col space-y-4">
               {user ? (
                 <>
                   <button
                     onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}
-                    className="w-full py-2 text-left text-black hover:text-blue-600 transition-colors"
+                    className="w-full py-2 text-left text-black dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     Profile
                   </button>
                   <button
                     onClick={() => { setIsMenuOpen(false); router.push('/dashboard'); }}
-                    className="w-full py-2 text-left text-black hover:text-blue-600 transition-colors"
+                    className="w-full py-2 text-left text-black dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     Dashboard
                   </button>
@@ -199,7 +216,7 @@ export default function ResponsiveNavBar() {
                   <Link
                     href="/login"
                     onClick={() => setIsMenuOpen(false)}
-                    className="w-full py-2 border border-blue-600 text-blue-600 rounded text-center hover:bg-blue-50 transition"
+                    className="w-full py-2 border border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 rounded text-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
                   >
                     Login
                   </Link>

@@ -42,7 +42,7 @@ export default function SoilHealthPage() {
   };
 
   const handleSubmit = async () => {
-    console.log("🔄 Submitting form...");
+
     const missingFields = requiredFields.filter(
       (key) => !formData[key] || isNaN(parseFloat(formData[key]!))
     );
@@ -53,14 +53,14 @@ export default function SoilHealthPage() {
 
     setLoading(true);
     try {
-      console.log("📡 Sending prediction request to Django...");
+
       const payload = Object.fromEntries(
         requiredFields.map(key => [key, parseFloat(formData[key]!)])
       );
 
       // 1. Get Prediction
       const prediction = await fetchApi<{ fertility_class: string, confidence: number }>('/soil/predict/', payload, 'POST');
-      console.log("✅ Prediction result:", prediction);
+
 
       setFormData((prev) => ({
         ...prev,
@@ -69,7 +69,7 @@ export default function SoilHealthPage() {
       }));
 
       // 2. Save to DB (Next.js API route)
-      console.log("📦 Saving to DB...");
+
       // improved error handling for the local API call as well
       const dbRes = await fetch('/api/soil', {
         method: isExisting ? 'PUT' : 'POST',
@@ -83,7 +83,7 @@ export default function SoilHealthPage() {
       });
 
       const dbResult = await dbRes.json();
-      console.log("✅ DB result:", dbResult);
+
 
       if (dbRes.ok) {
         toast.success('✅ Data saved successfully');

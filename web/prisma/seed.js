@@ -18,8 +18,8 @@ async function main() {
     },
   });
 
-  console.log(`🔍 Found user: ${user.name} (${user.email})`);
-  console.log('🌱 Seeding stocks...');
+
+
 
   await prisma.stock.createMany({
     data: [
@@ -37,7 +37,7 @@ async function main() {
   });
 
 
-  console.log('🌱 Seeding workers...');
+
 
   await prisma.worker.createMany({
     data: [
@@ -54,7 +54,7 @@ async function main() {
     ],
   });
 
-  console.log('🌱 Seeding soil data...');
+
 
   // await prisma.soilData.createMany({
   //   data: [
@@ -102,7 +102,7 @@ async function main() {
     ],
   });
 
-  console.log('✅ Seeding complete!');
+
 }
 
 main()
