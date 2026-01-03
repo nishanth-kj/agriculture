@@ -23,11 +23,8 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 
 # Install dependencies using uv into the system python
-# Use --frozen to respect lockfile
-RUN uv sync --frozen
-
-# Update PATH to use virtual environment if uv created one (optional with --system, but good practice)
-ENV PATH="/app/.venv/bin:$PATH"
+# Use --frozen to respect lockfile and --system for global installation
+RUN uv sync --frozen --system
 
 # Copy the entire app code into the container
 COPY . .
@@ -44,4 +41,4 @@ EXPOSE 8000
 # Command to run the Django server
 # Use gunicorn for production as it binds to the port quickly
 # Use --timeout 120 as model loading can still be slow on first request
-CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 120"]
+CMD ["sh", "-c", "gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 120"]
