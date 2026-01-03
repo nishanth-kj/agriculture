@@ -1,55 +1,42 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
-import Link from 'next/link'
-import { signIn } from 'next-auth/react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import Link from 'next/link'
 
 export default function SignUpPage() {
   const router = useRouter()
+  const { register } = useAuth()
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async () => {
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      toast.error(data.error || 'Sign up failed')
+    if (!form.name || !form.email || !form.password) {
+      toast.error('Please fill in all fields')
       return
     }
 
-    toast.success('Account created! Logging in...')
-
-    // Auto-login after signup
-    const loginRes = await signIn('credentials', {
-      redirect: false,
-      email: form.email,
-      password: form.password,
-    })
-
-    if (!loginRes?.error) {
-      router.push('/dashboard')
-    } else {
-      toast.error('Login failed after signup')
-      router.push('/login')
+    setLoading(true)
+    try {
+      await register(form)
+      toast.success('Account created and logged in!')
+      // redirect is handled in register() in AuthContext
+    } catch (err: any) {
+      toast.error(err.message || 'Registration failed')
+    } finally {
+      setLoading(false)
     }
   }
-
-
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -58,20 +45,20 @@ export default function SignUpPage() {
           <h2 className="text-xl font-bold text-center">Sign Up</h2>
           <div className="space-y-2">
             <Label>Name</Label>
-            <Input name="name" onChange={handleChange} />
+            <Input name="name" placeholder="Your Name" onChange={handleChange} />
           </div>
           <div className="space-y-2">
             <Label>Email</Label>
-            <Input name="email" type="email" onChange={handleChange} />
+            <Input name="email" type="email" placeholder="email@example.com" onChange={handleChange} />
           </div>
           <div className="space-y-2">
             <Label>Password</Label>
-            <Input name="password" type="password" onChange={handleChange} />
+            <Input name="password" type="password" placeholder="••••••••" onChange={handleChange} />
           </div>
-          <Button className="w-full" onClick={handleSubmit}>
-            Sign Up
+          <Button className="w-full" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Signing up...' : 'Sign Up'}
           </Button>
-          <p className="text-sm text-center text-muted-foreground mt-4">
+          <p className="text-sm text-center text-muted-foreground">
             Already have an account?{' '}
             <Link href="/login" className="text-blue-600 hover:underline">
               Login

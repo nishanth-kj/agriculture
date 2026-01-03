@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
+import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -12,53 +12,29 @@ import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [form, setForm] = useState({ email: '', password: '' })
-
-  // ✅ Auto-redirect if already authenticated
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/auth/profile', {
-          credentials: 'include',
-        })
-
-        if (res.ok) {
-          // Token is valid → redirect to homepage
-          router.push('/')
-        }
-      } catch (err) {
-        console.error('Token check failed', err)
-      }
-    }
-
-    checkAuth()
-  }, [router])
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  /*
-   * Handle Login with NextAuth
-   */
   const handleLogin = async () => {
+    if (!form.email || !form.password) {
+      toast.error('Please fill in all fields')
+      return
+    }
+
+    setLoading(true)
     try {
-      const res = await signIn('credentials', {
-        redirect: false,
-        email: form.email,
-        password: form.password,
-      })
-
-      if (res?.error) {
-        toast.error('Invalid credentials')
-        return
-      }
-
+      await login(form)
       toast.success('Login successful')
-      router.push('/dashboard') // or router.refresh()
-    } catch (err) {
-      console.error('Login error:', err)
-      toast.error('An unexpected error occurred')
+      // router.push is handled inside login() in AuthContext
+    } catch (err: any) {
+      toast.error(err.message || 'Invalid credentials')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -69,14 +45,14 @@ export default function LoginPage() {
           <h2 className="text-xl font-bold text-center">Login</h2>
           <div className="space-y-2">
             <Label>Email</Label>
-            <Input name="email" type="email" onChange={handleChange} />
+            <Input name="email" type="email" placeholder="email@example.com" onChange={handleChange} />
           </div>
           <div className="space-y-2">
             <Label>Password</Label>
-            <Input name="password" type="password" onChange={handleChange} />
+            <Input name="password" type="password" placeholder="••••••••" onChange={handleChange} />
           </div>
-          <Button className="w-full" onClick={handleLogin}>
-            Login
+          <Button className="w-full" onClick={handleLogin} disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             Don&apos;t have an account?{' '}

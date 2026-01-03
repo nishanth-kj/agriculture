@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useSession, signOut } from 'next-auth/react'
+import { useAuth } from '@/context/AuthContext'
 import {
   FaBars,
   FaTimes,
@@ -23,12 +23,11 @@ import { Button } from '@/components/ui/button'
 
 export default function ResponsiveNavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { data: session } = useSession()
-  const user = session?.user
+  const { user, logout } = useAuth()
   const router = useRouter()
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/login' })
+    await logout()
   }
 
   return (
@@ -61,7 +60,7 @@ export default function ResponsiveNavBar() {
             <Popover>
               <PopoverTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src={user.image || ''} />
+                  {/* Assuming user might have an avatarUrl or similar, using first letter as fallback */}
                   <AvatarFallback>{user.name ? user.name[0] : 'U'}</AvatarFallback>
                 </Avatar>
               </PopoverTrigger>
