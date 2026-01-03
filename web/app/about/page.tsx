@@ -88,12 +88,11 @@ export default function AboutPage() {
               <FaRocket className="mr-2 text-blue-600" />
               Our Mission
             </h2>
-            <p className="text-gray-600 leading-relaxed">
-              At Neuro Kodes, we aim to empower farmers with the tools and
-              knowledge necessary to optimize agricultural processes. Our goal
-              is to provide cutting-edge solutions for crop prediction, soil
-              health analysis, and pest management, helping farmers achieve
-              higher productivity with lower risk.
+            <p className="text-lg leading-relaxed mb-6">
+              At AgriTech, we aim to empower farmers with the tools and
+              knowledge they need to succeed in a rapidly changing world. By
+              combining traditional farming wisdom with modern technology, we are
+              building a sustainable future for agriculture.
             </p>
           </div>
 

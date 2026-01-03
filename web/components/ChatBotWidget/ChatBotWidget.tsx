@@ -124,7 +124,7 @@ export default function ChatBotWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-20 right-6 z-50">
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
@@ -184,8 +184,8 @@ export default function ChatBotWidget() {
                 >
                   <div
                     className={`max-w-xs md:max-w-md rounded-lg px-3 py-2 ${msg.sender === 'bot'
-                        ? 'bg-green-100 dark:bg-gray-600 text-gray-800 dark:text-gray-100'
-                        : 'bg-blue-100 dark:bg-blue-900 text-gray-800 dark:text-gray-100'
+                      ? 'bg-green-100 dark:bg-gray-600 text-gray-800 dark:text-gray-100'
+                      : 'bg-blue-100 dark:bg-blue-900 text-gray-800 dark:text-gray-100'
                       }`}
                   >
                     <div className="flex items-center mb-1">

@@ -1,9 +1,36 @@
 
-# Agriculture AI Software Documentation
+# AgriTech - AI Agriculture Platform
 
 ### Project Overview
 
-This agriculture-focused AI software combines Django (backend) and Next.js 15 (frontend) to empower farmers and agricultural stakeholders with tools to monitor crop health, predict yields, and receive alerts on weather and pest risks. The platform incorporates **Generative AI** and **IoT** to support sustainable agriculture by providing features like crop prediction, soil health monitoring, pest prediction, and real-time monitoring of climate and price data.
+AgriTech is a comprehensive agriculture-focused AI platform that combines a **Django** backend with a **Next.js 15** frontend. Our mission is to empower farmers with actionable insights derived from advanced machine learning and real-time data monitoring.
+
+**Key capabilities include:**
+- 🌱 **Crop & Fertilizer Prediction**: Suggests optimal crops and nutrients based on soil NPK values and pH.
+- 🔬 **Soil Health Monitoring**: Analyzes soil quality to recommend improvements.
+- 🐞 **Pest & Disease Detection**: Identifying plant diseases from images using computer vision.
+- 📊 **Real-time Analytics**: Monitoring climate, market prices, and historical production data.
+
+> [!NOTE]
+> For detailed API documentation and developer guides, please see [docs/guide.md](docs/guide.md).
+
+---
+
+## 🚀 How It Works
+
+AgriTech leverages a microservices-based architecture where the **Python/Django** backend handles complex ML inference (Random Forest, CNNs), while the **Next.js** frontend provides a responsive, user-friendly dashboard for farmers.
+
+1.  **Data Collection**: IoT sensors and manual input collect soil and environmental data.
+2.  **AI Inference**: Data is sent to the Python backend where trained models analyze it.
+3.  **Actionable Insights**: The frontend displays easy-to-understand recommendations (e.g., "Grow Rice", "Apply Nitrogen").
+
+---
+
+## 🔗 Source Code
+
+**GitHub Repository:** [https://github.com/nishanth-kj/agriculture](https://github.com/nishanth-kj/agriculture)
+
+---
 
 ---
 
@@ -304,7 +331,7 @@ This project is licensed under the MIT License:
 # The MIT License (Modified)
 
 
-Copyright (c) <2024> Neuro Kode
+Copyright (c) <2024> AgriTech
 
 Permission is hereby granted to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software subject to the following conditions:
 
