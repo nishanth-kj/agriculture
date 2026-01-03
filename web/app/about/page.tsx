@@ -5,8 +5,17 @@ import { FaGithub, FaBullseye, FaRocket } from "react-icons/fa";
 import Image from "next/image";
 import Shivamurthy from "@/assets/Shivamurthy.png";
 import Guide from "@/assets/Akshatha M.png";
+interface GithubProfile {
+  name: string;
+  role: string;
+  avatarUrl: string;
+  bio: string;
+  publicRepos: number;
+  githubUrl: string;
+}
+
 export default function AboutPage() {
-  const [githubData, setGithubData] = useState([]);
+  const [githubData, setGithubData] = useState<GithubProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch GitHub profiles for all team members

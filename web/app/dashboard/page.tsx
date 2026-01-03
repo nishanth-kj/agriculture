@@ -6,6 +6,11 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination';
+import {
+    FaCloudSun, FaMapMarkerAlt, FaThermometerHalf, FaWind, FaClock,
+    FaMoneyBillWave, FaChartLine, FaBox, FaShoppingBasket, FaUserTie,
+    FaSeedling, FaChevronDown
+} from 'react-icons/fa';
 
 interface Stock {
     name: string;
@@ -158,14 +163,16 @@ export default function DashboardPage() {
         <div className="max-w-screen-xl mx-auto space-y-6 p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {/* 📍 Location & Weather Details Card */}
-                <Card className="p-6 bg-white shadow">
-                    <h2 className="text-lg font-semibold mb-3">🌤️ Weather & Location</h2>
+                <Card className="p-6 bg-card text-card-foreground shadow">
+                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                        <FaCloudSun className="text-blue-500" /> Weather & Location
+                    </h2>
                     {weather ? (
                         <div className="space-y-2">
-                            <p><strong>📍 Coordinates:</strong> {weather.location.name}, {weather.location.region}</p>
-                            <p><strong>🌡 Temperature:</strong> {weather.current.temp_c}°C</p>
-                            <p><strong>💨 Condition:</strong> {weather.current.condition.text}</p>
-                            <p><strong>🕒 Time:</strong> {weather.current.time}</p>
+                            <p className="flex items-center gap-2"><FaMapMarkerAlt className="text-blue-600" /> <strong>Coordinates:</strong> {weather.location.name}, {weather.location.region}</p>
+                            <p className="flex items-center gap-2"><FaThermometerHalf className="text-green-600" /> <strong>Temperature:</strong> {weather.current.temp_c}°C</p>
+                            <p className="flex items-center gap-2"><FaWind className="text-amber-600" /> <strong>Condition:</strong> {weather.current.condition.text}</p>
+                            <p className="flex items-center gap-2"><FaClock className="text-purple-600" /> <strong>Time:</strong> {weather.current.time}</p>
                         </div>
                     ) : (
                         <p>Fetching weather and location...</p>
@@ -173,23 +180,29 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* 💰 Financial Summary Card */}
-                <Card className="p-6 bg-white shadow">
-                    <h2 className="text-lg font-semibold mb-3">💰 Financial Summary</h2>
+                <Card className="p-6 bg-card text-card-foreground shadow">
+                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                        <FaMoneyBillWave className="text-green-600" /> Financial Summary
+                    </h2>
                     <p><strong>Total Revenue:</strong> ₹{totalRevenue.toFixed(2)}</p>
                     <p><strong>Total Cost:</strong> ₹{totalCost.toFixed(2)}</p>
-                    <p className={totalProfit >= 0 ? "text-green-600" : "text-red-600"}>
+                    <p className={totalProfit >= 0 ? "text-green-600 flex items-center gap-1" : "text-red-600 flex items-center gap-1"}>
                         <strong>Total Profit:</strong> ₹{totalProfit.toFixed(2)}
                     </p>
                     <p><strong>Labour Cost:</strong> ₹{totalLabourCost.toFixed(2)}</p>
                 </Card>
 
                 {/* 📦 Stock & Worker Summary Card */}
-                <Card className="p-6 bg-white shadow">
-                    <h2 className="text-lg font-semibold mb-3">📦 Stock & Labour Overview</h2>
+                <Card className="p-6 bg-card text-card-foreground shadow">
+                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                        <FaBox className="text-amber-600" /> Stock & Labour Overview
+                    </h2>
 
                     {/* Stock Details */}
                     <div className="mb-4">
-                        <h3 className="text-md font-semibold mb-2">🧺 Stock Summary</h3>
+                        <h3 className="text-md font-semibold mb-2 flex items-center gap-2">
+                            <FaShoppingBasket className="text-orange-500" /> Stock Summary
+                        </h3>
                         <p><strong>Stock Items:</strong> {stocks.length}</p>
                         <p><strong>Total Quantity:</strong> {stocks.reduce((sum, s) => sum + s.quantity, 0)}</p>
                         <p><strong>Total Cost of Stocks:</strong> ₹{stocks.reduce((sum, s) => sum + s.cost * s.quantity, 0).toFixed(2)}</p>
@@ -203,7 +216,9 @@ export default function DashboardPage() {
 
                     {/* Labour Details */}
                     <div>
-                        <h3 className="text-md font-semibold mb-2">👷 Labour Summary</h3>
+                        <h3 className="text-md font-semibold mb-2 flex items-center gap-2">
+                            <FaUserTie className="text-blue-500" /> Labour Summary
+                        </h3>
                         <p><strong>Total Workers:</strong> {workers.length}</p>
                         <p><strong>Total Labour Cost:</strong> ₹{totalLabourCost.toFixed(2)}</p>
                     </div>
@@ -215,10 +230,10 @@ export default function DashboardPage() {
 
             </div>
             <div className="w-full">
-                <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-                    Price History Data
+                <h2 className="text-3xl font-bold text-center text-foreground mb-6 flex items-center justify-center gap-2">
+                    <FaChartLine className="text-blue-600" /> Price History Data
                 </h2>
-                <div className="bg-white rounded-lg shadow p-6 overflow-x-auto">
+                <div className="bg-card rounded-lg shadow p-6 overflow-x-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -241,17 +256,19 @@ export default function DashboardPage() {
                     </Table>
                     <div className="text-center mt-4">
                         <button
-                            className="text-blue-600 hover:underline text-sm"
+                            className="text-blue-600 hover:underline text-sm flex items-center justify-center mx-auto gap-1"
                             onClick={() => setShowAllPrices(prev => !prev)}
                         >
-                            {showAllPrices ? 'Show Less' : 'Show More'}
+                            {showAllPrices ? 'Show Less' : 'Show More'} <FaChevronDown className={`transition-transform ${showAllPrices ? 'rotate-180' : ''}`} />
                         </button>
                     </div>
                 </div>
             </div>
             {/* Paginated Stocks */}
-            <Card className="p-6 bg-white shadow">
-                <h2 className="text-lg font-semibold mb-2">📦 Stocks</h2>
+            <Card className="p-6 bg-card text-card-foreground shadow">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <FaBox className="text-amber-600" /> Stocks
+                </h2>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -286,8 +303,10 @@ export default function DashboardPage() {
             </Card>
 
             {/* Paginated Workers */}
-            <Card className="p-6 bg-white shadow">
-                <h2 className="text-lg font-semibold mb-2">👷 Workers</h2>
+            <Card className="p-6 bg-card text-card-foreground shadow">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <FaUserTie className="text-blue-500" /> Workers
+                </h2>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -320,8 +339,10 @@ export default function DashboardPage() {
             </Card>
 
             {/* Soil Data */}
-            <Card className="p-6 bg-white shadow">
-                <h2 className="text-lg font-semibold mb-2">🌱 Soil Data</h2>
+            <Card className="p-6 bg-card text-card-foreground shadow">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <FaSeedling className="text-green-600" /> Soil Data
+                </h2>
                 <Table>
                     <TableHeader>
                         <TableRow>

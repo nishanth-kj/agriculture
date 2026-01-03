@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -9,7 +13,7 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -17,7 +21,7 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission, e.g., send the form data to your server or API
 
@@ -40,68 +44,47 @@ export default function ContactPage() {
           </h1>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label
-                htmlFor="name"
-                className="block text-green-800 font-medium text-sm"
-              >
-                Name
-              </label>
-              <input
+              <Label htmlFor="name" className="mb-2 block">Name</Label>
+              <Input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full p-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 placeholder="Enter your name"
                 required
               />
             </div>
 
             <div className="mb-4">
-              <label
-                htmlFor="email"
-                className="block text-green-800 font-medium text-sm"
-              >
-                Email
-              </label>
-              <input
+              <Label htmlFor="email" className="mb-2 block">Email</Label>
+              <Input
                 type="email"
                 id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 placeholder="Enter your email"
                 required
               />
             </div>
 
             <div className="mb-4">
-              <label
-                htmlFor="message"
-                className="block text-green-800 font-medium text-sm"
-              >
-                Message
-              </label>
-              <textarea
+              <Label htmlFor="message" className="mb-2 block">Message</Label>
+              <Textarea
                 id="message"
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full p-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                rows="4"
+                rows={4}
                 placeholder="Enter your message"
                 required
-              ></textarea>
+              />
             </div>
 
-            <button
-              type="submit"
-              className="px-5 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition"
-            >
+            <Button type="submit">
               Send Message
-            </button>
+            </Button>
           </form>
         </div>
 

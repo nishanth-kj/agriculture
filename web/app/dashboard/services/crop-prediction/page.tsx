@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
@@ -105,60 +109,70 @@ export default function CropPredictionPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
-          <label className="block mb-1 font-semibold">Crop</label>
-          <select
+          <Label className="mb-2 block">Crop</Label>
+          <Select
             value={formData.crop}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, crop: e.target.value as Crop })}
-            className="w-full p-2 border rounded"
+            onValueChange={(value) => setFormData({ ...formData, crop: value as Crop })}
           >
-            {CROPS.map((crop) => (
-              <option key={crop} value={crop}>{crop}</option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Crop" />
+            </SelectTrigger>
+            <SelectContent>
+              {CROPS.map((crop) => (
+                <SelectItem key={crop} value={crop}>{crop}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <label className="block mb-1 font-semibold">State</label>
-          <select
+          <Label className="mb-2 block">State</Label>
+          <Select
             value={formData.state}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, state: e.target.value as State })}
-            className="w-full p-2 border rounded"
+            onValueChange={(value) => setFormData({ ...formData, state: value as State })}
           >
-            {STATES.map((state) => (
-              <option key={state} value={state}>{state}</option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select State" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATES.map((state) => (
+                <SelectItem key={state} value={state}>{state}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <label className="block mb-1 font-semibold">Season</label>
-          <select
+          <Label className="mb-2 block">Season</Label>
+          <Select
             value={formData.season}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, season: e.target.value as Season })}
-            className="w-full p-2 border rounded"
+            onValueChange={(value) => setFormData({ ...formData, season: value as Season })}
           >
-            {SEASONS.map((season) => (
-              <option key={season} value={season}>{season}</option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Season" />
+            </SelectTrigger>
+            <SelectContent>
+              {SEASONS.map((season) => (
+                <SelectItem key={season} value={season}>{season}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <label className="block mb-1 font-semibold">Area (hectares)</label>
-          <input
+          <Label className="mb-2 block">Area (hectares)</Label>
+          <Input
             type="number"
             value={formData.area_hectares}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, area_hectares: Number(e.target.value) })}
-            className="w-full p-2 border rounded"
             placeholder="e.g. 2.5"
             min={0.1}
             step={0.1}
           />
         </div>
         <div className="md:col-span-2">
-          <label className="block mb-1 font-semibold">Suggest a Crop (optional)</label>
-          <input
+          <Label className="mb-2 block">Suggest a Crop (optional)</Label>
+          <Input
             type="text"
             list="suggestions"
             placeholder="Try typing Millet, Sunflower..."
-            className="w-full p-2 border rounded"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, crop: e.target.value as Crop })}
           />
           <datalist id="suggestions">
@@ -168,13 +182,12 @@ export default function CropPredictionPage() {
           </datalist>
         </div>
         <div className="md:col-span-2">
-          <label className="block mb-1 font-semibold">Custom Question (optional)</label>
-          <textarea
+          <Label className="mb-2 block">Custom Question (optional)</Label>
+          <Textarea
             value={manualQuestion}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setManualQuestion(e.target.value)}
             placeholder="e.g. What crop is best for this soil in winter?"
             rows={3}
-            className="w-full p-2 border rounded"
           />
         </div>
       </div>

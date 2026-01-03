@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
+import { FaFlask, FaSeedling, FaBullseye } from "react-icons/fa";
 
 const requiredFields = [
   'N', 'P', 'K', 'pH', 'EC', 'OC', 'S', 'Zn', 'Fe', 'Cu', 'Mn', 'B'
@@ -104,11 +105,11 @@ export default function SoilHealthPage() {
 
   return (
     <div className="max-w-xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold mb-6">🧪 SOIL FERTILITY FORM</h1>
+      <h1 className="text-3xl font-bold mb-6 flex items-center gap-2"><FaFlask className="text-purple-600" /> SOIL FERTILITY FORM</h1>
       {formData.fertilityClass && (
         <div className="mt-6 text-lg text-green-700 font-medium">
-          🌾 Fertility Class: <strong>{formData.fertilityClass}</strong><br />
-          🎯 Confidence: <strong>{formData.confidence}</strong>
+          <p className="flex items-center gap-2"><FaSeedling className="text-green-600" /> Fertility Class: <strong>{formData.fertilityClass}</strong></p>
+          <p className="flex items-center gap-2"><FaBullseye className="text-red-500" /> Confidence: <strong>{formData.confidence}</strong></p>
         </div>
       )}
       {requiredFields.map((key) => (

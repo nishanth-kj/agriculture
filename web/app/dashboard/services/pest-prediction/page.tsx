@@ -2,6 +2,10 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
@@ -73,34 +77,34 @@ export default function PestPredictionForm() {
       <h1 className="text-3xl font-bold mb-2 text-center uppercase tracking-tight">🐛 Pest Prediction</h1>
       <p className="text-slate-500 mb-8 text-center font-medium">Identify likely pests affecting your crops.</p>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-2xl shadow-lg border">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-card p-6 rounded-2xl shadow-lg border">
         {/* Crop & Location */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 text-sm font-semibold">Crop Type*</label>
-            <select
-              name="cropType"
+            <Label className="mb-2 block">Crop Type*</Label>
+            <Select
               value={formData.cropType}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-lg"
+              onValueChange={(value) => setFormData(prev => ({ ...prev, cropType: value }))}
             >
-              <option value="">Select Crop</option>
-              {['Rice', 'Wheat', 'Maize', 'Cotton', 'Sugarcane'].map(crop => (
-                <option key={crop} value={crop.toLowerCase()}>{crop}</option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Crop" />
+              </SelectTrigger>
+              <SelectContent>
+                {['Rice', 'Wheat', 'Maize', 'Cotton', 'Sugarcane'].map(crop => (
+                  <SelectItem key={crop} value={crop.toLowerCase()}>{crop}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-semibold">Location*</label>
-            <input
+            <Label className="mb-2 block">Location*</Label>
+            <Input
               type="text"
               name="location"
               value={formData.location}
               onChange={handleChange}
               required
-              className="w-full p-2 border rounded-lg"
               placeholder="Village or District"
             />
           </div>
@@ -109,71 +113,73 @@ export default function PestPredictionForm() {
         {/* Growth & Weather */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 text-sm font-semibold">Growth Stage</label>
-            <select
-              name="growthStage"
+            <Label className="mb-2 block">Growth Stage</Label>
+            <Select
               value={formData.growthStage}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              onValueChange={(value) => setFormData(prev => ({ ...prev, growthStage: value }))}
             >
-              <option value="">Select Stage</option>
-              {GROWTH_STAGES.map(stage => (
-                <option key={stage} value={stage.toLowerCase()}>{stage}</option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Stage" />
+              </SelectTrigger>
+              <SelectContent>
+                {GROWTH_STAGES.map(stage => (
+                  <SelectItem key={stage} value={stage.toLowerCase()}>{stage}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-semibold">Weather</label>
-            <select
-              name="weather"
+            <Label className="mb-2 block">Weather</Label>
+            <Select
               value={formData.weather}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              onValueChange={(value) => setFormData(prev => ({ ...prev, weather: value }))}
             >
-              <option value="">Select Weather</option>
-              {WEATHER_OPTIONS.map(w => (
-                <option key={w} value={w.toLowerCase()}>{w}</option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Weather" />
+              </SelectTrigger>
+              <SelectContent>
+                {WEATHER_OPTIONS.map(w => (
+                  <SelectItem key={w} value={w.toLowerCase()}>{w}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Problem & Symptoms */}
         <div>
-          <label className="block mb-1 text-sm font-semibold">Problem Description*</label>
-          <textarea
+          <Label className="mb-2 block">Problem Description*</Label>
+          <Textarea
             name="message"
             value={formData.message}
             onChange={handleChange}
             rows={3}
-            className="w-full p-2 border rounded-lg"
             placeholder="Briefly describe what you're seeing on the crop"
             required
           />
         </div>
 
         <div>
-          <label className="block mb-1 text-sm font-semibold">Observed Symptoms</label>
-          <input
+          <Label className="mb-2 block">Observed Symptoms</Label>
+          <Input
             type="text"
             name="observedSymptoms"
             value={formData.observedSymptoms}
             onChange={handleChange}
-            className="w-full p-2 border rounded-lg"
             placeholder="e.g., yellow leaves, stunted growth (comma separated)"
           />
         </div>
 
         {/* Submit */}
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 px-4 rounded-lg text-white font-medium flex justify-center items-center ${loading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
-            }`}
+          className="w-full"
         >
-          {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Predict Pest'}
-        </button>
+          {loading ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : null}
+          {loading ? 'Predicting...' : 'Predict Pest'}
+        </Button>
       </form>
 
       {/* Error */}
