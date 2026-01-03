@@ -48,7 +48,13 @@ ENV TF_CPP_MIN_LOG_LEVEL=3
 ENV TF_ENABLE_ONEDNN_OPTS=0
 ENV MALLOC_TRIM_THRESHOLD_=100000
 
+# Thread pinning to reduce memory overhead and contention
+ENV TF_NUM_INTEROP_THREADS=1
+ENV TF_NUM_INTRAOP_THREADS=1
+ENV OMP_NUM_THREADS=1
+ENV MKL_NUM_THREADS=1
+
 # Command to run the Django server
-# Use gunicorn for production as it binds to the port quickly
-# Use --timeout 300 as model loading can still be slow on first request
-CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 300"]
+# We use one worker with threads to stay under Render's memory limit (512MB-1GB)
+# --preload ensures the master process loads the app once
+CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --threads 4 --timeout 300 --preload"]

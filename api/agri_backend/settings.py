@@ -48,9 +48,6 @@ INSTALLED_APPS = [
     "soil_fertility",
     'corsheaders',
     'predictor',
-    'training',
-
-
 ]
 
 MIDDLEWARE = [
