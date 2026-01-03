@@ -2,7 +2,11 @@
 FROM python:3.12-slim
 
 # Copy uv from the official image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+# Install uv via pip
+RUN pip install uv
+
+# Increase timeout for downloading large dependencies (like torch/cuda)
+ENV UV_HTTP_TIMEOUT=1000
 
 # Set working directory
 WORKDIR /app
@@ -11,7 +15,7 @@ WORKDIR /app
 COPY pyproject.toml .
 
 # Install dependencies using uv into the system python
-RUN uv pip install --system .
+RUN uv sync
 
 # Copy the entire app code into the container
 COPY . .
