@@ -1,16 +1,19 @@
-// prisma/seed.ts
+// prisma/seed.js
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   const user = await prisma.user.upsert({
     where: { email: 'nishanthkj12@gmail.com' },
-    update: {},
+    update: {
+      password: await bcrypt.hash("AdminAdmin", 10),
+    },
     create: {
       name: 'Nishanth K J',
       email: 'nishanthkj12@gmail.com',
-      password: "$2b$10$9K4M/Xu43VrNdCIXYQkzre4aQBkq5QKdZ1g/TI3qmV.Ylkf24PimS", // Hashed "AdminAdmin"
+      password: await bcrypt.hash("AdminAdmin", 10),
       role: 'FARMER',
     },
   });
@@ -32,7 +35,7 @@ async function main() {
       { name: 'Life', quantity: 92, location: 'East Johnmouth', cost: 16.8, sellingPrice: 28.0, userId: user.id },
     ],
   });
-  
+
 
   console.log('🌱 Seeding workers...');
 
@@ -98,7 +101,7 @@ async function main() {
       },
     ],
   });
-  
+
   console.log('✅ Seeding complete!');
 }
 

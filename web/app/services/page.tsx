@@ -103,59 +103,78 @@ export default function ServicesPage() {
 
       <div className="container mx-auto px-6 lg:px-12">
         {/* WEATHER */}
-        <div className="bg-white rounded-lg shadow p-6 mb-12">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">🌤️ Live Weather Info</h2>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-12">
+          <h2 className="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6">🌤️ Live Weather Info</h2>
           {weather ? (
-            <div className="space-y-2 text-sm text-center">
-              <p><strong>📍 Location:</strong> {weather.location.name}, {weather.location.region}</p>
-              <p><strong>🌡 Temperature:</strong> {weather.current.temp_c}°C</p>
-              <p><strong>💨 Condition:</strong> {weather.current.condition.text}</p>
-              <p><strong>🕒 Time:</strong> {weather.current.time}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm md:text-base text-center sm:text-left max-w-2xl mx-auto">
+              <div className="bg-blue-50 p-4 rounded-xl">
+                <p><strong>📍 Location:</strong></p>
+                <p className="text-gray-600 truncate">{weather.location.name}, {weather.location.region}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-xl">
+                <p><strong>🌡 Temperature:</strong></p>
+                <p className="text-gray-600">{weather.current.temp_c}°C</p>
+              </div>
+              <div className="bg-amber-50 p-4 rounded-xl">
+                <p><strong>💨 Condition:</strong></p>
+                <p className="text-gray-600">{weather.current.condition.text}</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-xl">
+                <p><strong>🕒 Time:</strong></p>
+                <p className="text-gray-600 truncate">{weather.current.time}</p>
+              </div>
             </div>
-          ) : <p className="text-center">Loading weather data...</p>}
+          ) : <div className="flex justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>}
         </div>
 
         {/* PRICE TABLE */}
-        <div className="bg-white rounded-lg shadow p-6 overflow-x-auto mb-12">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Price Data</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Commodity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Market</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {displayedPrices.map((price, idx) => (
-                <TableRow key={idx}>
-                  <TableCell>{price.commodity}</TableCell>
-                  <TableCell>₹{price.value.toFixed(2)}</TableCell>
-                  <TableCell>{price.market}</TableCell>
-                  <TableCell>{price.arrival_date}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8 whitespace-nowrap overflow-hidden text-ellipsis">Market Price Data</h2>
+          <div className="overflow-x-auto -mx-6 px-6 scrollbar-hide">
+            <div className="min-w-[600px] pb-4">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50/50">
+                    <TableHead className="font-bold">Commodity</TableHead>
+                    <TableHead className="font-bold">Price</TableHead>
+                    <TableHead className="font-bold">Market</TableHead>
+                    <TableHead className="font-bold">Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {displayedPrices.map((price, idx) => (
+                    <TableRow key={idx} className="hover:bg-gray-50/50 transition-colors">
+                      <TableCell className="font-medium text-gray-900">{price.commodity}</TableCell>
+                      <TableCell className="text-green-600 font-bold">₹{price.value.toFixed(2)}</TableCell>
+                      <TableCell className="text-gray-600">{price.market}</TableCell>
+                      <TableCell className="text-gray-500 text-sm whitespace-nowrap">{price.arrival_date}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
           {!showAllPrices && (
-            <div className="text-center mt-4">
+            <div className="text-center mt-6">
               <button
-                className="text-blue-600 hover:underline text-sm"
+                className="inline-flex items-center px-6 py-2 bg-blue-50 text-blue-600 font-semibold rounded-full hover:bg-blue-100 transition-all text-sm group"
                 onClick={() => setShowAllPrices(true)}
               >
-                Show more
+                View More Market Data
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
             </div>
           )}
         </div>
 
         {/* SMART SERVICES */}
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-12 mt-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12 mt-16 px-4">
           🌿 Our Smart Farming Services
-        </h1>
+        </h2>
         <div className="w-full flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-6xl px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
             {[
               {
                 name: "Soil Health",

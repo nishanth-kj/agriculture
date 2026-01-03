@@ -5,22 +5,24 @@ import IMG from "@/assets/famer.png"; // Ensure this path is correct
 
 export default function HeroPage() {
   return (
-    <section className="relative bg-green-50 h-[90vh] pt-16">
+    <section className="relative bg-green-50 min-h-[calc(100vh-4rem)] flex items-center">
       {/* Container with Grid Layout */}
-      <div className="container mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 items-center justify-center h-full">
+      <div className="container mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 items-center justify-center py-12 lg:py-0">
         {/* Image Section */}
-        <div className="flex justify-center mb-8 lg:mb-0">
-          <Image
-            src={IMG} // Ensure path is correct
-            alt="Agriculture Hero"
-            width={400}
-            height={400}
-            className="rounded-lg shadow-lg"
-          />
+        <div className="flex justify-center mb-12 lg:mb-0 order-2 lg:order-1">
+          <div className="relative w-full max-w-[320px] md:max-w-[400px] aspect-square">
+            <Image
+              src={IMG}
+              alt="Agriculture Hero"
+              fill
+              className="rounded-3xl shadow-2xl object-cover ring-8 ring-white/50"
+              priority
+            />
+          </div>
         </div>
 
         {/* Text Section */}
-        <div className="text-center lg:text-left">
+        <div className="text-center lg:text-left order-1 lg:order-2">
           <h1 className="text-4xl lg:text-6xl font-extrabold text-green-800 leading-tight">
             Unlock the Future of{" "}
             <span className="text-blue-600">Agriculture</span>

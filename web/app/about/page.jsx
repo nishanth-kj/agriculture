@@ -73,13 +73,13 @@ export default function AboutPage() {
           About Us
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
               <FaRocket className="mr-2 text-blue-600" />
               Our Mission
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 leading-relaxed">
               At Neuro Kodes, we aim to empower farmers with the tools and
               knowledge necessary to optimize agricultural processes. Our goal
               is to provide cutting-edge solutions for crop prediction, soil
@@ -88,12 +88,12 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
               <FaBullseye className="mr-2 text-green-600" />
               Our Vision
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 leading-relaxed">
               We envision a future where agriculture is data-driven and
               sustainable. By leveraging technology, we aim to make farming
               smarter and more efficient for the benefit of communities,
@@ -116,7 +116,7 @@ export default function AboutPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Team Guide Card First */}
               <div className="bg-white p-6 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
                 <Image

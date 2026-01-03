@@ -226,98 +226,131 @@ export default function ManagingPage() {
   const totalWorkerPages = Math.ceil(filteredWorkers.length / ITEMS_PER_PAGE);
   //if (isAuthenticated === null) return <p className="text-center mt-10">Checking authentication...</p>;
 
-  return isAuthenticated === null ? (<div>  </div>
-  ) : isAuthenticated === false ? (<LoginRequired />) : (
-
-    <div className="max-w-7xl mx-auto px-4 py-12 space-y-12">
+  return isAuthenticated === null ? (
+    <div />
+  ) : isAuthenticated === false ? (
+    <LoginRequired />
+  ) : (
+    <div className="container mx-auto px-6 lg:px-12 py-12 space-y-12">
       {/* STOCKS */}
-      <Card className="p-6 space-y-4">
-        <h2 className="text-2xl font-bold">Stocks</h2>
-        <div className="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-6 gap-4">
-          <Input placeholder="Name" value={stockForm.name} onChange={e => setStockForm({ ...stockForm, name: e.target.value })} />
-          <Input placeholder="Quantity" type="number" value={stockForm.quantity} onChange={e => setStockForm({ ...stockForm, quantity: e.target.value })} />
-          <Input placeholder="Location" value={stockForm.location} onChange={e => setStockForm({ ...stockForm, location: e.target.value })} />
-          <Input placeholder="Cost" type="number" value={stockForm.cost} onChange={e => setStockForm({ ...stockForm, cost: e.target.value })} />
-          <Input placeholder="Selling Price" type="number" value={stockForm.sellingPrice} onChange={e => setStockForm({ ...stockForm, sellingPrice: e.target.value })} />
+      <Card className="p-4 md:p-6 space-y-6">
+        <h2 className="text-2xl font-bold">Stocks Management</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-4">
+          <Input
+            placeholder="Name"
+            value={stockForm.name}
+            onChange={(e) => setStockForm({ ...stockForm, name: e.target.value })}
+          />
+          <Input
+            placeholder="Quantity"
+            type="number"
+            value={stockForm.quantity}
+            onChange={(e) => setStockForm({ ...stockForm, quantity: e.target.value })}
+          />
+          <Input
+            placeholder="Location"
+            value={stockForm.location}
+            onChange={(e) => setStockForm({ ...stockForm, location: e.target.value })}
+          />
+          <Input
+            placeholder="Cost"
+            type="number"
+            value={stockForm.cost}
+            onChange={(e) => setStockForm({ ...stockForm, cost: e.target.value })}
+          />
+          <Input
+            placeholder="Selling Price"
+            type="number"
+            value={stockForm.sellingPrice}
+            onChange={(e) => setStockForm({ ...stockForm, sellingPrice: e.target.value })}
+          />
           <Button onClick={addStock}>Add Stock</Button>
         </div>
 
-        <Input className="max-w-xs" placeholder="Search Stock" value={searchStock} onChange={e => setSearchStock(e.target.value)} />
+        <Input
+          className="max-w-xs"
+          placeholder="Search Stock"
+          value={searchStock}
+          onChange={(e) => setSearchStock(e.target.value)}
+        />
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Cost</TableHead>
-              <TableHead>Selling Price</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginate(filteredStocks, stockPage).map(stock => (
-              <TableRow key={stock.id}>
-                <TableCell>{stock.name}</TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    value={stock.quantity}
-                    onChange={(e) => {
-                      const updated = stocks.map(s =>
-                        s.id === stock.id ? { ...s, quantity: parseInt(e.target.value) } : s
-                      );
-                      setStocks(updated);
-                    }}
-                  />
-                </TableCell>
-                <TableCell>{stock.location}</TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    value={stock.cost}
-                    onChange={(e) => {
-                      const updated = stocks.map(s =>
-                        s.id === stock.id ? { ...s, cost: parseFloat(e.target.value) } : s
-                      );
-                      setStocks(updated);
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    value={stock.sellingPrice}
-                    onChange={(e) => {
-                      const updated = stocks.map(s =>
-                        s.id === stock.id ? { ...s, sellingPrice: parseFloat(e.target.value) } : s
-                      );
-                      setStocks(updated);
-                    }}
-                  />
-                </TableCell>
-                <TableCell className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => updateStock(stock.id, stock.quantity, stock.cost, stock.sellingPrice)}
-                  >
-                    Update
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => deleteStock(stock.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+        <div className="overflow-x-auto -mx-4 px-4">
+          <div className="min-w-[800px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Cost</TableHead>
+                  <TableHead>Selling Price</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginate(filteredStocks, stockPage).map((stock) => (
+                  <TableRow key={stock.id}>
+                    <TableCell>{stock.name}</TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={stock.quantity}
+                        onChange={(e) => {
+                          const updated = stocks.map((s) =>
+                            s.id === stock.id ? { ...s, quantity: parseInt(e.target.value) } : s
+                          );
+                          setStocks(updated);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>{stock.location}</TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={stock.cost}
+                        onChange={(e) => {
+                          const updated = stocks.map((s) =>
+                            s.id === stock.id ? { ...s, cost: parseFloat(e.target.value) } : s
+                          );
+                          setStocks(updated);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={stock.sellingPrice}
+                        onChange={(e) => {
+                          const updated = stocks.map((s) =>
+                            s.id === stock.id ? { ...s, sellingPrice: parseFloat(e.target.value) } : s
+                          );
+                          setStocks(updated);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => updateStock(stock.id, stock.quantity, stock.cost, stock.sellingPrice)}
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteStock(stock.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
-        </Table>
-
-        <div className="flex justify-between text-sm text-muted-foreground px-2 pt-4">
+        <div className="flex justify-between text-sm text-muted-foreground px-2 pt-4 border-t">
           <p>Total Quantity: {totalStockQuantity}</p>
           <p>Total Profit: ₹{totalStockProfit.toFixed(2)}</p>
         </div>
@@ -325,106 +358,152 @@ export default function ManagingPage() {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href="#" onClick={e => {
-                e.preventDefault();
-                setStockPage(prev => Math.max(prev - 1, 1));
-              }} />
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setStockPage((prev) => Math.max(prev - 1, 1));
+                }}
+              />
             </PaginationItem>
             {Array.from({ length: totalStockPages }).map((_, index) => (
               <PaginationItem key={index}>
-                <PaginationLink href="#" isActive={stockPage === index + 1} onClick={e => {
-                  e.preventDefault();
-                  setStockPage(index + 1);
-                }}>{index + 1}</PaginationLink>
+                <PaginationLink
+                  href="#"
+                  isActive={stockPage === index + 1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setStockPage(index + 1);
+                  }}
+                >
+                  {index + 1}
+                </PaginationLink>
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext href="#" onClick={e => {
-                e.preventDefault();
-                setStockPage(prev => Math.min(prev + 1, totalStockPages));
-              }} />
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setStockPage((prev) => Math.min(prev + 1, totalStockPages));
+                }}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </Card>
 
       {/* WORKERS */}
-      <Card className="p-6 space-y-4">
-        <h2 className="text-2xl font-bold">Workers</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Input placeholder="Name" value={workerForm.name} onChange={e => setWorkerForm({ ...workerForm, name: e.target.value })} />
-          <Input placeholder="Role" value={workerForm.role} onChange={e => setWorkerForm({ ...workerForm, role: e.target.value })} />
-          <Input placeholder="Farm" value={workerForm.farm} onChange={e => setWorkerForm({ ...workerForm, farm: e.target.value })} />
+      <Card className="p-4 md:p-6 space-y-6">
+        <h2 className="text-2xl font-bold">Workers Management</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <Input
+            placeholder="Name"
+            value={workerForm.name}
+            onChange={(e) => setWorkerForm({ ...workerForm, name: e.target.value })}
+          />
+          <Input
+            placeholder="Role"
+            value={workerForm.role}
+            onChange={(e) => setWorkerForm({ ...workerForm, role: e.target.value })}
+          />
+          <Input
+            placeholder="Farm"
+            value={workerForm.farm}
+            onChange={(e) => setWorkerForm({ ...workerForm, farm: e.target.value })}
+          />
           <Button onClick={addWorker}>Add Worker</Button>
         </div>
 
-        <Input className="max-w-xs" placeholder="Search Worker" value={searchWorker} onChange={e => setSearchWorker(e.target.value)} />
+        <Input
+          className="max-w-xs"
+          placeholder="Search Worker"
+          value={searchWorker}
+          onChange={(e) => setSearchWorker(e.target.value)}
+        />
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Farm</TableHead>
-              <TableHead>Cost</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginate(filteredWorkers, workerPage).map(worker => (
-              <TableRow key={worker.id}>
-                <TableCell>{worker.name}</TableCell>
-                <TableCell>{worker.role}</TableCell>
-                <TableCell>{worker.farm}</TableCell>
+        <div className="overflow-x-auto -mx-4 px-4">
+          <div className="min-w-[600px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Farm</TableHead>
+                  <TableHead>Cost</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginate(filteredWorkers, workerPage).map((worker) => (
+                  <TableRow key={worker.id}>
+                    <TableCell>{worker.name}</TableCell>
+                    <TableCell>{worker.role}</TableCell>
+                    <TableCell>{worker.farm}</TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={worker.cost}
+                        onChange={(e) => {
+                          const updated = workers.map((w) =>
+                            w.id === worker.id ? { ...w, cost: parseFloat(e.target.value) } : w
+                          );
+                          setWorkers(updated);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="flex gap-2">
+                      <Button size="sm" onClick={() => updateWorker(worker.id, worker.cost)}>
+                        Update
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteWorker(worker.id)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
-                <TableCell>
-                  <Input
-                    type="number"
-                    value={worker.cost}
-                    onChange={(e) => {
-                      const updated = workers.map(w =>
-                        w.id === worker.id ? { ...w, cost: parseFloat(e.target.value) } : w
-                      );
-                      setWorkers(updated);
-                    }}
-                  />
-                </TableCell>
-
-                <TableCell className="flex gap-2">
-                  <Button size="sm" onClick={() => updateWorker(worker.id, worker.cost)}>Update</Button>
-                  <Button size="sm" variant="destructive" onClick={() => deleteWorker(worker.id)}>Delete</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-
-        </Table>
-
-        <div className="flex justify-end text-sm text-muted-foreground px-2 pt-4">
+        <div className="flex justify-end text-sm text-muted-foreground px-2 pt-4 border-t">
           <p>Total Worker Cost: ₹{totalWorkerCost.toFixed(2)}</p>
         </div>
 
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href="#" onClick={e => {
-                e.preventDefault();
-                setWorkerPage(prev => Math.max(prev - 1, 1));
-              }} />
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setWorkerPage((prev) => Math.max(prev - 1, 1));
+                }}
+              />
             </PaginationItem>
             {Array.from({ length: totalWorkerPages }).map((_, index) => (
               <PaginationItem key={index}>
-                <PaginationLink href="#" isActive={workerPage === index + 1} onClick={e => {
-                  e.preventDefault();
-                  setWorkerPage(index + 1);
-                }}>{index + 1}</PaginationLink>
+                <PaginationLink
+                  href="#"
+                  isActive={workerPage === index + 1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setWorkerPage(index + 1);
+                  }}
+                >
+                  {index + 1}
+                </PaginationLink>
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext href="#" onClick={e => {
-                e.preventDefault();
-                setWorkerPage(prev => Math.min(prev + 1, totalWorkerPages));
-              }} />
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setWorkerPage((prev) => Math.min(prev + 1, totalWorkerPages));
+                }}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
