@@ -18,7 +18,7 @@ COPY pyproject.toml uv.lock ./
 
 # Install dependencies using uv into the system python
 # Use --frozen to respect lockfile
-RUN uv sync --frozen --system
+RUN uv sync --frozen
 
 # Update PATH to use virtual environment if uv created one (optional with --system, but good practice)
 ENV PATH="/app/.venv/bin:$PATH"
