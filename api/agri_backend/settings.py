@@ -20,10 +20,10 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-*wve0u&s(j(z!h)&p&*k1#tlh-&fj#6q!87q88(9at84vwdc%_"
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-*wve0u&s(j(z!h)&p&*k1#tlh-&fj#6q!87q88(9at84vwdc%_")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']

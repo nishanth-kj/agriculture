@@ -19,21 +19,26 @@ ENV UV_COMPILE_BYTECODE=1
 # Set working directory
 WORKDIR /app
 
+# Set location for the virtual environment
+ENV UV_PROJECT_ENVIRONMENT=/venv
+# Update PATH to use the virtual environment
+ENV PATH="/venv/bin:$PATH"
+
 # Copy dependency definition
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies using uv into the system python
-# Use --frozen to respect lockfile and --system for global installation
-RUN uv sync --frozen --system
+# Install dependencies using uv
+# Use --frozen to respect lockfile
+RUN uv sync --frozen
 
 # Copy the entire app code into the container
 COPY . .
 
 # Pre-download models to avoid timeouts on Render
-RUN uv run python download_models.py
+RUN python download_models.py
 
-# Collect static files (optional, commenting out as per original)
-RUN uv run python manage.py collectstatic --noinput
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
 # Expose the port that Django will run on
 EXPOSE 8000
