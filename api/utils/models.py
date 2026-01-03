@@ -3,6 +3,11 @@ import pickle
 import tensorflow as tf
 from django.conf import settings
 
+# Check environment for GPU usage
+use_gpu = os.getenv('USE_GPU', 'false').lower() == 'true'
+if not use_gpu:
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 class ModelService:
     _models = {}
 
