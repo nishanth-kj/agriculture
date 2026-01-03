@@ -9,6 +9,8 @@ RUN pip install uv
 ENV USE_GPU=false
 # Increase timeout for downloading large dependencies (like torch/cuda)
 ENV UV_HTTP_TIMEOUT=1200
+# Suppress warning about hardlinks during build
+ENV UV_LINK_MODE=copy
 
 # Set working directory
 WORKDIR /app
@@ -27,10 +29,12 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY . .
 
 # Collect static files (optional, commenting out as per original)
-#RUN python manage.py collectstatic --noinput
+# Collect static files (optional, commenting out as per original)
+RUN uv run python manage.py collectstatic --noinput
 
 # Expose the port that Django will run on
 EXPOSE 8000
 
 # Command to run the Django server
-CMD ["uv","run","python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Use sh -c to expand environment variables at runtime
+CMD ["sh", "-c", "uv run python manage.py runserver 0.0.0.0:${PORT:-8000}"]
