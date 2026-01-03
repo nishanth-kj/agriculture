@@ -327,7 +327,7 @@ export default function ManagingPage() {
           <p>Total Profit: ₹{totalStockProfit.toFixed(2)}</p>
         </div>
 
-        <Pagination>
+        <Pagination className="justify-end mt-4">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
@@ -338,20 +338,11 @@ export default function ManagingPage() {
                 }}
               />
             </PaginationItem>
-            {Array.from({ length: totalStockPages }).map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  href="#"
-                  isActive={stockPage === index + 1}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setStockPage(index + 1);
-                  }}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            <PaginationItem>
+              <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">
+                {stockPage} / {totalStockPages}
+              </span>
+            </PaginationItem>
             <PaginationItem>
               <PaginationNext
                 href="#"
@@ -443,7 +434,7 @@ export default function ManagingPage() {
           <p>Total Worker Cost: ₹{totalWorkerCost.toFixed(2)}</p>
         </div>
 
-        <Pagination>
+        <Pagination className="justify-end mt-4">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
@@ -454,20 +445,11 @@ export default function ManagingPage() {
                 }}
               />
             </PaginationItem>
-            {Array.from({ length: totalWorkerPages }).map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  href="#"
-                  isActive={workerPage === index + 1}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setWorkerPage(index + 1);
-                  }}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            <PaginationItem>
+              <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">
+                {workerPage} / {totalWorkerPages}
+              </span>
+            </PaginationItem>
             <PaginationItem>
               <PaginationNext
                 href="#"

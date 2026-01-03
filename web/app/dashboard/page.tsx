@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination';
 import {
     FaCloudSun, FaMapMarkerAlt, FaThermometerHalf, FaWind, FaClock,
     FaMoneyBillWave, FaChartLine, FaBox, FaShoppingBasket, FaUserTie,
@@ -269,35 +269,53 @@ export default function DashboardPage() {
                 <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
                     <FaBox className="text-amber-600" /> Stocks
                 </h2>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Quantity</TableHead>
-                            <TableHead>Cost</TableHead>
-                            <TableHead>Selling Price</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginate(stocks, stockPage).map((s, idx) => (
-                            <TableRow key={idx}>
-                                <TableCell>{s.name}</TableCell>
-                                <TableCell>{s.quantity}</TableCell>
-                                <TableCell>{s.cost}</TableCell>
-                                <TableCell>{s.sellingPrice}</TableCell>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Quantity</TableHead>
+                                <TableHead>Cost</TableHead>
+                                <TableHead>Selling Price</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <Pagination>
+                        </TableHeader>
+                        <TableBody>
+                            {paginate(stocks, stockPage).map((s, idx) => (
+                                <TableRow key={idx}>
+                                    <TableCell>{s.name}</TableCell>
+                                    <TableCell>{s.quantity}</TableCell>
+                                    <TableCell>{s.cost}</TableCell>
+                                    <TableCell>{s.sellingPrice}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                <Pagination className="mt-4 justify-end">
                     <PaginationContent>
-                        {[...Array(Math.ceil(stocks.length / ITEMS_PER_PAGE)).keys()].map(i => (
-                            <PaginationItem key={i}>
-                                <PaginationLink href="#" isActive={stockPage === i + 1} onClick={() => setStockPage(i + 1)}>
-                                    {i + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
+                        <PaginationItem>
+                            <PaginationPrevious
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setStockPage(prev => Math.max(prev - 1, 1));
+                                }}
+                            />
+                        </PaginationItem>
+                        <PaginationItem>
+                            <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">
+                                {stockPage} / {Math.ceil(stocks.length / ITEMS_PER_PAGE) || 1}
+                            </span>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setStockPage(prev => Math.min(prev + 1, Math.ceil(stocks.length / ITEMS_PER_PAGE)));
+                                }}
+                            />
+                        </PaginationItem>
                     </PaginationContent>
                 </Pagination>
             </Card>
@@ -307,33 +325,51 @@ export default function DashboardPage() {
                 <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
                     <FaUserTie className="text-blue-500" /> Workers
                 </h2>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Cost</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginate(workers, workerPage).map((w, idx) => (
-                            <TableRow key={idx}>
-                                <TableCell>{w.name}</TableCell>
-                                <TableCell>{w.role}</TableCell>
-                                <TableCell>{w.cost}</TableCell>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Role</TableHead>
+                                <TableHead>Cost</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <Pagination>
+                        </TableHeader>
+                        <TableBody>
+                            {paginate(workers, workerPage).map((w, idx) => (
+                                <TableRow key={idx}>
+                                    <TableCell>{w.name}</TableCell>
+                                    <TableCell>{w.role}</TableCell>
+                                    <TableCell>{w.cost}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                <Pagination className="mt-4 justify-end">
                     <PaginationContent>
-                        {[...Array(Math.ceil(workers.length / ITEMS_PER_PAGE)).keys()].map(i => (
-                            <PaginationItem key={i}>
-                                <PaginationLink href="#" isActive={workerPage === i + 1} onClick={() => setWorkerPage(i + 1)}>
-                                    {i + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
+                        <PaginationItem>
+                            <PaginationPrevious
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setWorkerPage(prev => Math.max(prev - 1, 1));
+                                }}
+                            />
+                        </PaginationItem>
+                        <PaginationItem>
+                            <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">
+                                {workerPage} / {Math.ceil(workers.length / ITEMS_PER_PAGE) || 1}
+                            </span>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setWorkerPage(prev => Math.min(prev + 1, Math.ceil(workers.length / ITEMS_PER_PAGE)));
+                                }}
+                            />
+                        </PaginationItem>
                     </PaginationContent>
                 </Pagination>
             </Card>

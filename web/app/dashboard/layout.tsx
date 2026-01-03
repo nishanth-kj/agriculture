@@ -159,30 +159,27 @@ export default function DashboardLayout({
                     isCollapsed ? "md:ml-[116px]" : "md:ml-[300px]" // Dynamic left margin
                 )}
             >
-                {/* Mobile Navigation Header */}
-                <div className="md:hidden bg-background/80 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between sticky top-16 z-10">
-                    <div className="flex items-center gap-2">
-                        <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-                            <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="md:hidden">
-                                    <Menu className="w-5 h-5" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="left" className="p-0 border-r border-border bg-card w-[280px]">
-                                <SidebarContent
-                                    isCollapsed={false}
-                                    pathname={pathname}
-                                    user={user}
-                                    logout={logout}
-                                    onItemClick={() => setIsMobileOpen(false)}
-                                />
-                            </SheetContent>
-                        </Sheet>
-                        <Leaf className="w-5 h-5 text-primary" />
-                        <span className="text-foreground font-black text-lg tracking-tight truncate">
-                            {user?.name || 'AgriTech'}
-                        </span>
-                    </div>
+                {/* Mobile Sidebar Toggle */}
+                <div className="md:hidden">
+                    <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                        <SheetTrigger asChild>
+                            <Button
+                                size="icon"
+                                className="fixed left-0 top-24 z-40 rounded-r-xl rounded-l-none h-10 w-8 bg-black/90 dark:bg-primary/90 hover:bg-black dark:hover:bg-primary shadow-md transition-all duration-300 ease-in-out active:scale-95"
+                            >
+                                <ChevronRight className="w-5 h-5 text-white" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="left" className="p-0 border-r border-border bg-card w-[280px]">
+                            <SidebarContent
+                                isCollapsed={false}
+                                pathname={pathname}
+                                user={user}
+                                logout={logout}
+                                onItemClick={() => setIsMobileOpen(false)}
+                            />
+                        </SheetContent>
+                    </Sheet>
                 </div>
 
                 {/* Dynamically Injected Content */}
