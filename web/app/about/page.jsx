@@ -16,7 +16,7 @@ export default function AboutPage() {
       {
         name: "Nishanth K J",
         role: "Lead, Full Stack Developer & AI/ML Specialist",
-        github: "https://github.com/nishanthkj",
+        github: "https://github.com/nishanth-kj",
       },
       {
         name: "Likith D",
