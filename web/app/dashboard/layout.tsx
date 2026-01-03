@@ -28,8 +28,6 @@ const SidebarContent = ({ isCollapsed, pathname, user, logout, onItemClick }: Si
         { name: 'Soil Health', href: '/dashboard/services/soil-health', icon: FlaskConical },
         { name: 'Crop Prediction', href: '/dashboard/services/crop-prediction', icon: Sprout },
         { name: 'Pest Prediction', href: '/dashboard/services/pest-prediction', icon: Bug },
-        { name: 'Docs', href: '/docs', icon: Lock },
-        { name: 'Contribution', href: '/contribution', icon: Users },
     ];
 
     return (
