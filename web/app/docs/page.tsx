@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { FaPython, FaGithub, FaCode, FaTerminal } from 'react-icons/fa';
+import { FaPython, FaGithub, FaCode, FaTerminal, FaCodeBranch, FaInfoCircle } from 'react-icons/fa';
 import {
     Select,
     SelectContent,
@@ -23,6 +23,7 @@ export default function DocsPage() {
                         <nav className="space-y-1">
                             <a href="#introduction" className="block px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition font-medium">Introduction</a>
                             <a href="#installation" className="block px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition font-medium">Installation</a>
+                            <a href="#contributing" className="block px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition font-medium">Contributing</a>
                         </nav>
                     </div>
                     <div>
@@ -37,6 +38,9 @@ export default function DocsPage() {
                         <nav className="space-y-1">
                             <Link href="https://github.com/nishanth-kj/agriculture" target="_blank" className="block px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition font-medium flex items-center">
                                 <FaGithub className="mr-2" /> GitHub Repo
+                            </Link>
+                            <Link href="https://github.com/nishanth-kj/agriculture/issues" target="_blank" className="block px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition font-medium flex items-center">
+                                <FaInfoCircle className="mr-2" /> Support / Issues
                             </Link>
                         </nav>
                     </div>
@@ -110,9 +114,8 @@ export default function DocsPage() {
                                 <div className="border rounded-xl p-4">
                                     <h4 className="font-bold text-blue-700 mb-2">Frontend (Next.js)</h4>
                                     <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                                        <li>Node.js 18+ Required</li>
+                                        <li>Node.js 20+ Required</li>
                                         <li><code>cd web</code></li>
-                                        <li><code>npm install</code></li>
                                         <li><code>npm run dev</code></li>
                                     </ul>
                                 </div>
@@ -177,6 +180,24 @@ file: <image_file>`}
                                     </pre>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </section>
+                <section id="contributing" className="mb-16 scroll-mt-28">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b pb-2 flex items-center">
+                        <FaCodeBranch className="mr-3 text-green-600" /> Contributing
+                    </h2>
+                    <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-8 rounded-xl border border-green-200 dark:border-green-800">
+                        <p className="text-gray-700 dark:text-gray-300 mb-6 text-lg">
+                            We welcome contributions from the community! Whether it's fixing bugs, improving documentation, or proposing new features, your help is appreciated.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Link href="/contribution" className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-md">
+                                <FaCodeBranch className="mr-2" /> View Contribution Guide
+                            </Link>
+                            <a href="https://github.com/nishanth-kj/agriculture" target="_blank" className="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <FaGithub className="mr-2" /> GitHub Repository
+                            </a>
                         </div>
                     </div>
                 </section>

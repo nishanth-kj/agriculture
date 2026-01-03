@@ -14,6 +14,7 @@ import {
     FaMoon,
     FaBook,
     FaGithub,
+    FaCodeBranch,
 } from 'react-icons/fa'
 import { useTheme } from 'next-themes'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -46,18 +47,23 @@ export default function ResponsiveNavBar() {
                 <div className="hidden md:flex flex-1 justify-center items-center">
                     <ul className="flex space-x-8 text-sm font-medium text-black dark:text-gray-200">
                         <li>
-                            <Link href="/" className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <Link href="/" className="flex items-center hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                 <FaHome className="mr-2" /> Home
                             </Link>
                         </li>
                         <li>
-                            <Link href="/#about" className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <Link href="/#about" className="flex items-center hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                 <FaInfoCircle className="mr-2" /> About
                             </Link>
                         </li>
                         <li>
-                            <Link href="/docs" className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <Link href="/docs" className="flex items-center hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                 <FaBook className="mr-2" /> Docs
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/contribution" className="flex items-center hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                <FaCodeBranch className="mr-2" /> Contribute
                             </Link>
                         </li>
                     </ul>
@@ -81,8 +87,8 @@ export default function ResponsiveNavBar() {
                         {user ? (
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <Avatar className="cursor-pointer border-2 border-transparent hover:border-blue-500 transition-all">
-                                        <AvatarFallback className="bg-blue-100 text-blue-700">
+                                    <Avatar className="cursor-pointer border-2 border-transparent hover:border-green-500 transition-all">
+                                        <AvatarFallback className="bg-green-100 text-green-700">
                                             {user.name ? user.name[0] : 'U'}
                                         </AvatarFallback>
                                     </Avatar>
@@ -149,7 +155,7 @@ export default function ResponsiveNavBar() {
                         </button>
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none"
+                            className="p-2 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors focus:outline-none"
                         >
                             {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                         </button>
@@ -165,7 +171,7 @@ export default function ResponsiveNavBar() {
                         {user && (
                             <div className="flex items-center space-x-4 p-3 border-b border-gray-300 dark:border-gray-700">
                                 <Avatar className="h-10 w-10">
-                                    <AvatarFallback className="bg-blue-600 text-white">
+                                    <AvatarFallback className="bg-green-600 text-white">
                                         {user.name ? user.name[0] : 'U'}
                                     </AvatarFallback>
                                 </Avatar>
@@ -179,19 +185,24 @@ export default function ResponsiveNavBar() {
                         {/* Navigation Links */}
                         <ul className="space-y-4 text-black dark:text-gray-200">
                             <li>
-                                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                     <FaHome className="mr-3" /> Home
                                 </Link>
                             </li>
 
                             <li>
-                                <Link href="/#about" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <Link href="/#about" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                     <FaInfoCircle className="mr-3" /> About
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/docs" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                <Link href="/docs" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                     <FaBook className="mr-3" /> Docs
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/contribution" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <FaCodeBranch className="mr-3" /> Contribute
                                 </Link>
                             </li>
                         </ul>
@@ -202,13 +213,13 @@ export default function ResponsiveNavBar() {
                                 <>
                                     <button
                                         onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}
-                                        className="w-full py-2 text-left text-black dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                        className="w-full py-2 text-left text-black dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                                     >
                                         Profile
                                     </button>
                                     <button
                                         onClick={() => { setIsMenuOpen(false); router.push('/dashboard'); }}
-                                        className="w-full py-2 text-left text-black dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                        className="w-full py-2 text-left text-black dark:text-gray-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                                     >
                                         Dashboard
                                     </button>
