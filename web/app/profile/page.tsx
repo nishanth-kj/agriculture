@@ -6,24 +6,18 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { toast } from "react-hot-toast";
 
+import { useAuth } from '@/context/AuthContext';
+
 export default function ProfilePage() {
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; email: string; phone?: string } | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/profile", { credentials: "include" })
-      .then(async res => {
-        if (!res.ok) {
-          toast.error("Not logged in");
-          return router.push("/login");
-        }
-        const data = await res.json();
-        setUser(data.user);
-      })
-      .catch(() => toast.error("Failed to fetch profile"))
-      .finally(() => setLoading(false));
-  }, [router]);
+    if (!loading && !user) {
+      toast.error("Not logged in");
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
   if (loading) return <p className="text-center mt-10">Loading profile...</p>;
 
@@ -35,8 +29,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p><strong>Email:</strong> {user?.email}</p>
-          {user?.phone && <p><strong>Phone:</strong> {user.phone}</p>}
-
+          <p><strong>Role:</strong> {user?.role}</p>
         </CardContent>
       </Card>
     </div>

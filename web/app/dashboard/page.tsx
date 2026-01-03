@@ -157,17 +157,18 @@ export default function DashboardPage() {
     return (
         <div className="max-w-screen-xl mx-auto space-y-6 p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* 📍 Location Details Card */}
+                {/* 📍 Location & Weather Details Card */}
                 <Card className="p-6 bg-white shadow">
-                    <h2 className="text-lg font-semibold mb-3">📍 Location Details</h2>
-                    {locationText ? (
-                        <>
-                            <p><strong>Latitude:</strong> {weather?.location.name}</p>
-                            <p><strong>Longitude:</strong> {weather?.location.region}</p>
-                            <p className="text-sm text-gray-600">This location is detected using browser GPS.</p>
-                        </>
+                    <h2 className="text-lg font-semibold mb-3">🌤️ Weather & Location</h2>
+                    {weather ? (
+                        <div className="space-y-2">
+                            <p><strong>📍 Coordinates:</strong> {weather.location.name}, {weather.location.region}</p>
+                            <p><strong>🌡 Temperature:</strong> {weather.current.temp_c}°C</p>
+                            <p><strong>💨 Condition:</strong> {weather.current.condition.text}</p>
+                            <p><strong>🕒 Time:</strong> {weather.current.time}</p>
+                        </div>
                     ) : (
-                        <p>Fetching location...</p>
+                        <p>Fetching weather and location...</p>
                     )}
                 </Card>
 
@@ -242,7 +243,7 @@ export default function DashboardPage() {
                         <button
                             className="text-blue-600 hover:underline text-sm"
                             onClick={() => setShowAllPrices(prev => !prev)}
-                        > 
+                        >
                             {showAllPrices ? 'Show Less' : 'Show More'}
                         </button>
                     </div>

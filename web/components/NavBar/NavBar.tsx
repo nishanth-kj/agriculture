@@ -47,16 +47,6 @@ export default function ResponsiveNavBar() {
               </Link>
             </li>
             <li>
-              <Link href="/services" className="flex items-center hover:text-blue-600 transition-colors">
-                <FaCogs className="mr-2" /> Services
-              </Link>
-            </li>
-            <li>
-              <Link href="/managing" className="flex items-center hover:text-blue-600 transition-colors">
-                <FaUsers className="mr-2" /> Managing
-              </Link>
-            </li>
-            <li>
               <Link href="/contact" className="flex items-center hover:text-blue-600 transition-colors">
                 <FaEnvelope className="mr-2" /> Contact
               </Link>
@@ -166,16 +156,6 @@ export default function ResponsiveNavBar() {
               <li>
                 <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 transition-colors">
                   <FaHome className="mr-3" /> Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 transition-colors">
-                  <FaCogs className="mr-3" /> Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/managing" onClick={() => setIsMenuOpen(false)} className="flex items-center py-2 hover:text-blue-600 transition-colors">
-                  <FaUsers className="mr-3" /> Managing
                 </Link>
               </li>
               <li>

@@ -16,11 +16,13 @@ interface User {
   avatar?: string
 }
 
+import { useAuth } from '@/context/AuthContext'
+
 export default function ChatBotWidget() {
+  const { user, loading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [user, setUser] = useState<User | null>(null)
   const [soilData, setSoilData] = useState<Record<string, number> | null>(null)
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -30,20 +32,22 @@ export default function ChatBotWidget() {
   }, [messages])
 
   useEffect(() => {
+    if (loading) return;
+
     const fetchData = async () => {
       try {
-        const userRes = await fetch('/api/auth/profile', { credentials: 'include' })
-        if (userRes.ok) {
-          const userData = await userRes.json()
-          setUser(userData.user)
-          setMessages(prev => [
-            ...prev,
-            {
-              sender: 'bot',
-              text: `🌿 Hi ${userData.user.name}, I'm AgriBot — your agriculture assistant! Ask me anything about crops, soil, or farming.`,
-              timestamp: new Date()
-            }
-          ])
+        if (user) {
+          setMessages(prev => {
+            if (prev.some(m => m.text.includes(user.name))) return prev;
+            return [
+              ...prev,
+              {
+                sender: 'bot',
+                text: `🌿 Hi ${user.name}, I'm AgriBot — your agriculture assistant! Ask me anything about crops, soil, or farming.`,
+                timestamp: new Date()
+              }
+            ];
+          })
         } else {
           setMessages([
             {
@@ -65,7 +69,7 @@ export default function ChatBotWidget() {
     }
 
     fetchData()
-  }, [])
+  }, [user, loading])
 
   const handleSend = async () => {
     if (!input.trim()) return
@@ -125,9 +129,8 @@ export default function ChatBotWidget() {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className={`relative flex items-center justify-center w-14 h-14 rounded-full shadow-lg ${
-          isOpen ? 'bg-green-700' : 'bg-green-600'
-        } text-white`}
+        className={`relative flex items-center justify-center w-14 h-14 rounded-full shadow-lg ${isOpen ? 'bg-green-700' : 'bg-green-600'
+          } text-white`}
         aria-label="AgriBot Chat"
       >
         <Bot className="w-6 h-6" />
@@ -180,11 +183,10 @@ export default function ChatBotWidget() {
                   className={`mb-3 flex ${msg.sender === 'bot' ? 'justify-start' : 'justify-end'}`}
                 >
                   <div
-                    className={`max-w-xs md:max-w-md rounded-lg px-3 py-2 ${
-                      msg.sender === 'bot'
+                    className={`max-w-xs md:max-w-md rounded-lg px-3 py-2 ${msg.sender === 'bot'
                         ? 'bg-green-100 dark:bg-gray-600 text-gray-800 dark:text-gray-100'
                         : 'bg-blue-100 dark:bg-blue-900 text-gray-800 dark:text-gray-100'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center mb-1">
                       {msg.sender === 'bot' ? (
