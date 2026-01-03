@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./api:/app
+      - /app/.venv
       - /app/__pycache__
     ports:
       - "8000:8000"

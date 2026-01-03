@@ -42,6 +42,6 @@ RUN uv run python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Command to run the Django server
-# Use sh -c to expand environment variables at runtime
-# Use --no-sync to prevent uv from checking/syncing at runtime
-CMD ["sh", "-c", "uv run --no-sync python manage.py runserver 0.0.0.0:${PORT:-8000}"]
+# Use gunicorn for production as it binds to the port quickly
+# Use --timeout 120 as model loading can still be slow on first request
+CMD ["sh", "-c", "uv run gunicorn agri_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --timeout 120"]
