@@ -15,7 +15,7 @@ export default function AboutPage() {
     const teamMembers = [
       {
         name: "Nishanth K J",
-        role: "Lead, Full Stack Developer & AI/ML",
+        role: "Lead, Full Stack Software Engineer & AI/ML",
         github: "https://github.com/nishanth-kj",
       },
       {
