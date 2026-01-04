@@ -6,8 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
 
 const requiredFields = [
   'N', 'P', 'K', 'pH', 'EC', 'OC', 'S', 'Zn', 'Fe', 'Cu', 'Mn', 'B'
@@ -16,7 +14,6 @@ const requiredFields = [
 type SoilFormType = Record<typeof requiredFields[number] | 'fertilityClass' | 'confidence', string>;
 
 export default function SoilHealthPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState<Partial<SoilFormType>>({});
   const [loading, setLoading] = useState(false);
   const [isExisting, setIsExisting] = useState(false);
@@ -26,7 +23,7 @@ export default function SoilHealthPage() {
       try {
         const res = await fetch('/api/soil', { credentials: 'include' });
         const result = await res.json();
-        if (result.success && result.data) {
+        if (result.status === 1 && result.data) {
           setFormData(result.data);
           setIsExisting(true);
         }
@@ -58,39 +55,30 @@ export default function SoilHealthPage() {
         requiredFields.map(key => [key, parseFloat(formData[key]!)])
       );
 
-      // 1. Get Prediction
-      const prediction = await fetchApi<{ fertility_class: string, confidence: number }>('/soil/predict/', payload, 'POST');
-
-
-      setFormData((prev) => ({
-        ...prev,
-        fertilityClass: prediction.fertility_class,
-        confidence: prediction.confidence.toString(),
-      }));
-
-      // 2. Save to DB (Next.js API route)
-
-      // improved error handling for the local API call as well
-      const dbRes = await fetch('/api/soil', {
+      // Call Next.js API which handles Python API call and database save
+      const response = await fetch('/api/soil', {
         method: isExisting ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          ...payload,
-          fertilityClass: prediction.fertility_class,
-          confidence: prediction.confidence,
-        })
+        body: JSON.stringify(payload)
       });
 
-      const dbResult = await dbRes.json();
+      const result = await response.json();
 
+      if (response.ok && result.status === 1) {
+        const { fertility_class, confidence } = result.data;
 
-      if (dbRes.ok) {
-        toast.success('✅ Data saved successfully');
+        setFormData((prev) => ({
+          ...prev,
+          fertilityClass: fertility_class,
+          confidence: confidence.toString(),
+        }));
+
+        toast.success('✅ Prediction successful!');
         setIsExisting(true);
       } else {
-        toast.error('❌ Failed to store data');
-        console.error(dbResult);
+        toast.error(result.message || '❌ Failed to get prediction');
+        console.error(result);
       }
 
     } catch (err: any) {
