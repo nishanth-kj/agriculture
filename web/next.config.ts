@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     domains: ["avatars.githubusercontent.com"], // Allow images from GitHub's avatar service
   },
   outputFileTracingIncludes: {
-    "/api/**/*": ["./prisma/generated/prisma/**/*"],
+    "/*": ["./prisma/generated/prisma/**/*"],
   },
   eslint: {
     ignoreDuringBuilds: true,
