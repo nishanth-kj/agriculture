@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from './lib/auth';
 
 const protectedRoutes = ['/dashboard', '/profile', '/stocks'];
 const authRoutes = ['/login', '/signup'];
@@ -15,12 +14,8 @@ export function middleware(req: NextRequest) {
 
     // 2. If trying to access login/signup while already authenticated
     if (authRoutes.some(route => pathname.startsWith(route)) && token) {
-        try {
-            verifyToken(token);
-            return NextResponse.redirect(new URL('/dashboard', req.url));
-        } catch (e) {
-            // Token invalid, allow access to auth routes
-        }
+        // Edge middleware avoids Node-only JWT libs; API routes still validate token server-side.
+        return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
     return NextResponse.next();
