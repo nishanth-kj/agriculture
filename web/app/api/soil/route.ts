@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
   if (!token) return NextResponse.json({ status: 0, message: 'Unauthorized', error: 'Unauthorized' }, { status: 401 });
 
-  const decoded = verifyToken(token) as JwtPayload;
+  const decoded = verifyToken(token) as unknown as JwtPayload;
   if (!decoded?.id) return NextResponse.json({ status: 0, message: 'Invalid token', error: 'Invalid token' }, { status: 401 });
 
   const record = await prisma.soilData.findFirst({ where: { userId: decoded.id } });
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
   if (!token) return NextResponse.json({ status: 0, message: 'Unauthorized', error: 'Unauthorized' }, { status: 401 });
 
-  const decoded = verifyToken(token) as JwtPayload;
+  const decoded = verifyToken(token) as unknown as JwtPayload;
   if (!decoded?.id) return NextResponse.json({ status: 0, message: 'Invalid token', error: 'Invalid token' }, { status: 401 });
 
   const body = await req.json();
@@ -84,7 +84,7 @@ export async function PUT(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
   if (!token) return NextResponse.json({ status: 0, message: 'Unauthorized', error: 'Unauthorized' }, { status: 401 });
 
-  const decoded = verifyToken(token) as JwtPayload;
+  const decoded = verifyToken(token) as unknown as JwtPayload;
   if (!decoded?.id) return NextResponse.json({ status: 0, message: 'Invalid token', error: 'Invalid token' }, { status: 401 });
 
   const body = await req.json();
