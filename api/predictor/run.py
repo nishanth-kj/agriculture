@@ -19,7 +19,9 @@ def get_genai_client():
     if _client is None:
         from google import genai
         GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-        _client = genai.Client(api_key=GEMINI_API_KEY or "AIzaSyAc8Fm4e8P51IvYNaAjeHMZcAxrPW-j1K8")
+        if not GEMINI_API_KEY:
+            raise RuntimeError("GEMINI_API_KEY is not set")
+        _client = genai.Client(api_key=GEMINI_API_KEY)
     return _client
 
 def run(prompt):

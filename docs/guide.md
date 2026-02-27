@@ -1,26 +1,21 @@
-# AgriTech Project Documentation
+# AgriTech Documentation Guide
 
-Welcome to the AgriTech documentation. This directory contains detailed guides for developers and contributors.
+This directory contains project documentation for contributors and maintainers.
 
-## 📚 Documentation Contents
+## Contents
 
-- **[Installation Guide](installation.md)**: Detailed instructions for setting up the project using Docker or manual installation for both backend and frontend.
-- **[API Reference](api.md)**: Comprehensive documentation of the available REST API endpoints, request/response formats, and examples.
-- **[Contributing](../contribution/page.tsx)**: Guidelines for contributing code (see the website Contribution page).
+- [Installation](installation.md)
+- [API Reference](api.md)
 
-## 🏗️ Project Overview
+## Stack
 
-AgriTech is a comprehensive AI-powered agriculture platform capable of:
-- **Crop Yield Prediction**: Using Random Forest algorithms.
-- **Pest Detection**: Using Convolutional Neural Networks (CNN).
-- **Soil Health Monitoring**: Real-time analysis of soil parameters.
+- Backend: Django + Django REST Framework
+- Frontend: Next.js + TypeScript
+- Database: SQLite (default dev), PostgreSQL (optional)
+- ML: scikit-learn, TensorFlow/PyTorch (project-dependent modules)
 
-### Architecture
-- **Backend**: Django REST Framework (Python 3.12)
-- **Frontend**: Next.js 15 (React/TypeScript)
-- **Database**: PostgreSQL (Production), SQLite (Development)
-- **ML Engine**: Scikit-Learn, PyTorch/TensorFlow
+## Security
 
-## 🔗 Quick Links
-- [GitHub Repository](https://github.com/nishanth-kj/agriculture)
-- [Live Demo/Website](https://agritech-platform.com) (Placeholder)
+- Keep all keys/secrets in environment files.
+- Never hardcode secrets in source code.
+- Rotate keys immediately if they are exposed.
