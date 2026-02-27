@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const token = req.cookies.get('token')?.value;
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const decoded = verifyToken(token) as JwtPayload;
+    const decoded = verifyToken(token) as unknown as JwtPayload;
     if (!decoded?.id) return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
 
     const body = await req.json();
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Decode the token to get userId
-    const decoded = verifyToken(token) as JwtPayload;
+    const decoded = verifyToken(token) as unknown as JwtPayload;
 
 
     // Check if the token contains userId

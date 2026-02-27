@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Decode the token to get userId
-    const decoded = verifyToken(token) as JwtPayload;
+    const decoded = verifyToken(token) as unknown as JwtPayload;
 
     // Check if the token contains userId
     if (!decoded?.id) {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Decode the token to get userId
-    const decoded = verifyToken(token) as JwtPayload;
+    const decoded = verifyToken(token) as unknown as JwtPayload;
 
     // Check if the token contains userId
     if (!decoded?.id) {
