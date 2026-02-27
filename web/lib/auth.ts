@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { NextRequest } from 'next/server';
-const JWT_SECRET = process.env.JWT_SECRET || 'NishanthKJ'
+
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not set')
+}
 
 export function signToken(payload: object) {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })

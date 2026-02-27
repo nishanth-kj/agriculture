@@ -1,46 +1,24 @@
 # API Documentation
 
-AgriTech provides a RESTful API to expose its Machine Learning capabilities.
+Base URL: `http://localhost:8000`
 
-**Base URL**: `http://localhost:8000`
+## Authentication
 
----
+Authentication uses JWT for protected routes.
 
-## 🔐 Authentication
+Header format:
 
-Authentication is handled via **JSON Web Tokens (JWT)**.
-
--   **Public Endpoints**: Most prediction endpoints (like Crop/Fertilizer recommendation) are open for demonstration.
--   **Protected Endpoints**: User data and history endpoints require a valid Bearer Token.
-
-**Header Format**:
 ```http
-Authorization: Bearer <your_access_token>
+Authorization: Bearer <access_token>
 ```
 
----
+## Crop and Fertilizer Recommendation
 
-## 🌾 Crop & Fertilizer Recommendation
+- Endpoint: `POST /api/crop-rf/`
+- Auth: Public
 
-Predicts the most suitable crop and fertilizer based on soil and environmental conditions.
+Request body example:
 
-- **Endpoint**: `/api/crop-rf/`
-- **Method**: `POST`
-- **Authentication**: None (Public)
-
-### Request Body
-
-| Field | Type  | Description |
-| :--- | :--- | :--- |
-| `N` | `float` | Ratio of Nitrogen content in soil |
-| `P` | `float` | Ratio of Phosphorous content in soil |
-| `K` | `float` | Ratio of Potassium content in soil |
-| `ph` | `float` | pH value of the soil |
-| `temperature` | `float` | Temperature in degree Celsius (Optional, often auto-fetched) |
-| `humidity` | `float` | Relative humidity in % (Optional) |
-| `rainfall` | `float` | Rainfall in mm (Optional) |
-
-**Example JSON:**
 ```json
 {
   "N": 90,
@@ -53,29 +31,24 @@ Predicts the most suitable crop and fertilizer based on soil and environmental c
 }
 ```
 
-### Response
+Response example:
 
 ```json
 {
-    "status": "success",
-    "data": {
-        "predicted_crop": "Rice",
-        "recommended_fertilizer": "Urea",
-        "confidence": 0.95
-    }
+  "status": "success",
+  "data": {
+    "predicted_crop": "Rice",
+    "recommended_fertilizer": "Urea",
+    "confidence": 0.95
+  }
 }
 ```
 
----
+## Yield Prediction
 
-## 📈 Yield Prediction
+- Endpoint: `POST /api/crop-yield/`
 
-Estimates the crop yield (production per unit area).
-
-- **Endpoint**: `/api/crop-yield/`
-- **Method**: `POST`
-
-### Request Body
+Request body example:
 
 ```json
 {
@@ -87,52 +60,20 @@ Estimates the crop yield (production per unit area).
 }
 ```
 
-### Response
+## Pest and Disease Prediction
 
-```json
-{
-    "prediction": 3500.50,
-    "unit": "Quintals"
-}
-```
+- Endpoint: `POST /api/prediction/pest-predict/`
+- Content-Type: `multipart/form-data`
+- Field: `file` (image)
 
----
+## Soil Fertility
 
-## 🐞 Pest & Disease Analysis
+- Endpoint: `GET /api/soil-fertility/`
+- Endpoint: `POST /api/soil-fertility/`
 
-Analyzes plant leaf images to detect diseases or pests.
+## Common Status Codes
 
-- **Endpoint**: `/api/prediction/pest-predict/`
-- **Method**: `POST`
-- **Content-Type**: `multipart/form-data`
-
-### Request
-
-- **file**: Binary image file (JPEG/PNG)
-
-### Response
-
-```json
-{
-    "result": "Corn Common Rust",
-    "confidence": 0.98,
-    "treatment": "Apply fungicide..."
-}
-```
-
----
-
-## 🧪 Soil Health (IoT Integration)
-
-*Note: This endpoint is often used by IoT devices.*
-
-- **Endpoint**: `/api/soil-fertility/`
-- **Method**: `GET` / `POST`
-
----
-
-## Status Codes
-
-- **200 OK**: Request successful.
-- **400 Bad Request**: Invalid input data.
-- **500 Internal Server Error**: ML Model failure or server issue.
+- `200`: Success
+- `400`: Invalid request
+- `401`: Unauthorized
+- `500`: Server error
