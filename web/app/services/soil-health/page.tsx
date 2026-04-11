@@ -87,7 +87,7 @@ export default function SoilHealthPage() {
 
 
       if (dbRes.ok) {
-        toast.success('✅ Data saved successfully');
+        toast.success('  Data saved successfully');
         setIsExisting(true);
       } else {
         toast.error('❌ Failed to store data');

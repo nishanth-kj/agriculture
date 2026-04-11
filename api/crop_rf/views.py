@@ -22,7 +22,7 @@ def get_rf_models():
         try:
             _nb_model = pickle.load(open(os.path.join(MODEL_PATH, 'naive_bayes_model.pkl'), 'rb'))
             _rf_model = pickle.load(open(os.path.join(MODEL_PATH, 'random_forest_model.pkl'), 'rb'))
-            print("✅ Models loaded successfully.")
+            print("  Models loaded successfully.")
         except Exception as e:
             print("❌ Error loading models:", e)
     return _nb_model, _rf_model
