@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai'
 
-// Enhanced Type definitions
-interface ChatRequest {
-  message: string
-  userName: string
-  soilData?: Record<string, number>
-  location?: string
-  cropType?: string
-}
-
-interface ChatResponse {
-  response: string
-  relatedTopics?: string[]
-}
-
-interface ErrorResponse {
-  error: string
-  details?: string
-}
+import { ChatRequest, ChatResponse, ApiErrorResponse as ErrorResponse } from "@/types";
 
 // Initialize Gemini AI with safety settings
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)

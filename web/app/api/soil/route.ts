@@ -1,149 +1,65 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/drizzle ';
-import { verifyToken } from '@/lib/auth';
-
-interface JwtPayload { id: string; }
-
-export async function GET(req: NextRequest) {
-  const token = req.cookies.get('token')?.value;
-  if (!token) return NextResponse.json({ status: 0, message: 'Unauthorized', error: 'Unauthorized' }, { status: 401 });
-
-  const decoded = verifyToken(token) as unknown as JwtPayload;
-  if (!decoded?.id) return NextResponse.json({ status: 0, message: 'Invalid token', error: 'Invalid token' }, { status: 401 });
-
-  const record = await prisma.soilData.findFirst({ where: { userId: decoded.id } });
-  return NextResponse.json({ status: 1, message: 'Success', data: record || null });
-}
+import { verifyToken, ApiResponse, ErrorException } from '@/lib/server';
+import { AUTH, STATUS } from '@/lib';
+import { JwtPayload, ApiErrorCode, ApiErrorMessage } from '@/types';
+import { NextRequest } from 'next/server';
+import { SoilService } from '@/services/soil.service';
 
 export async function POST(req: NextRequest) {
-  const token = req.cookies.get('token')?.value;
-  if (!token) return NextResponse.json({ status: 0, message: 'Unauthorized', error: 'Unauthorized' }, { status: 401 });
-
-  const decoded = verifyToken(token) as unknown as JwtPayload;
-  if (!decoded?.id) return NextResponse.json({ status: 0, message: 'Invalid token', error: 'Invalid token' }, { status: 401 });
-
-  const body = await req.json();
-  const { N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B } = body;
-
-  const values = [N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B];
-  if (values.some(val => val === undefined || isNaN(val))) {
-    return NextResponse.json({ status: 0, message: 'Missing or invalid soil data', error: 'Missing or invalid soil data' }, { status: 400 });
-  }
-
   try {
-    // Call Python API to get prediction
-    const pythonApiUrl = process.env.API_URL || 'https://agriculture-j9bi.onrender.com';
-    const response = await fetch(`${pythonApiUrl}/api/soil/predict/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B }),
-    });
+    const token = req.cookies.get(AUTH.COOKIE.NAME)?.value;
+    if (!token) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json({
-        status: 0,
-        message: 'Python API error',
-        error: errorData.message || 'Failed to get prediction'
-      }, { status: response.status });
+    const decoded = verifyToken(token) as JwtPayload;
+    if (!decoded?.id) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
+    const userId = typeof decoded.id === 'string' ? parseInt(decoded.id) : decoded.id;
+
+    const body = await req.json();
+
+    // Unified Upsert/Delete Logic
+    if (body.id) {
+      // Soft Delete if status is 0
+      if (body.status === 0 || body.status === STATUS.INACTIVE.code) {
+        const deleted = await SoilService.updateAndPredict(userId, {
+          ...body,
+          status: STATUS.INACTIVE.code
+        });
+        return ApiResponse(deleted).success();
+      }
+
+      // Update: Perform prediction and update existing record
+      const record = await SoilService.updateAndPredict(userId, body);
+      return ApiResponse(record).success();
     }
 
-    const prediction = await response.json();
-    const { fertility_class, confidence } = prediction.data || prediction;
-
-    // Save to database
-    const record = await prisma.soilData.create({
-      data: {
-        userId: decoded.id,
-        N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B,
-        fertilityClass: fertility_class,
-        confidence
-      }
-    });
-
-    return NextResponse.json({
-      status: 1,
-      message: 'Prediction successful',
-      data: {
-        ...record,
-        fertility_class,
-        confidence
-      }
-    });
-  } catch (error: any) {
-    console.error('Error calling Python API:', error);
-    return NextResponse.json({
-      status: 0,
-      message: 'Server error',
-      error: error.message || 'Failed to process request'
-    }, { status: 500 });
+    // Create: Predict and save new record
+    const record = await SoilService.predictAndSave(userId, body);
+    return ApiResponse(record).success();
+  } catch (error) {
+    console.error('Error in POST /api/soil:', error);
+    return ErrorException(
+      ApiErrorMessage.INTERNAL_SERVER_ERROR.value,
+      ApiErrorCode.INTERNAL_SERVER_ERROR.code
+    );
   }
 }
 
-export async function PUT(req: NextRequest) {
-  const token = req.cookies.get('token')?.value;
-  if (!token) return NextResponse.json({ status: 0, message: 'Unauthorized', error: 'Unauthorized' }, { status: 401 });
-
-  const decoded = verifyToken(token) as unknown as JwtPayload;
-  if (!decoded?.id) return NextResponse.json({ status: 0, message: 'Invalid token', error: 'Invalid token' }, { status: 401 });
-
-  const body = await req.json();
-  const { N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B } = body;
-
-  const values = [N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B];
-  if (values.some(val => val === undefined || isNaN(val))) {
-    return NextResponse.json({ status: 0, message: 'Missing or invalid soil data', error: 'Missing or invalid soil data' }, { status: 400 });
-  }
-
-  const existing = await prisma.soilData.findFirst({ where: { userId: decoded.id } });
-  if (!existing) return NextResponse.json({ status: 0, message: 'Record not found', error: 'Record not found' }, { status: 404 });
-
+export async function GET(req: NextRequest) {
   try {
-    // Call Python API to get fresh prediction
-    const pythonApiUrl = process.env.API_URL || 'https://agriculture-j9bi.onrender.com';
-    const response = await fetch(`${pythonApiUrl}/api/soil/predict/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B }),
-    });
+    const token = req.cookies.get(AUTH.COOKIE.NAME)?.value;
+    if (!token) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json({
-        status: 0,
-        message: 'Python API error',
-        error: errorData.message || 'Failed to get prediction'
-      }, { status: response.status });
-    }
+    const decoded = verifyToken(token) as JwtPayload;
+    if (!decoded?.id) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
+    const userId = typeof decoded.id === 'string' ? parseInt(decoded.id) : decoded.id;
 
-    const prediction = await response.json();
-    const { fertility_class, confidence } = prediction.data || prediction;
-
-    // Update database
-    const record = await prisma.soilData.update({
-      where: { id: existing.id },
-      data: {
-        N, P, K, pH, EC, OC, S, Zn, Fe, Cu, Mn, B,
-        fertilityClass: fertility_class,
-        confidence
-      }
-    });
-
-    return NextResponse.json({
-      status: 1,
-      message: 'Prediction updated',
-      data: {
-        ...record,
-        fertility_class,
-        confidence
-      }
-    });
-  } catch (error: any) {
-    console.error('Error calling Python API:', error);
-    return NextResponse.json({
-      status: 0,
-      message: 'Server error',
-      error: error.message || 'Failed to process request'
-    }, { status: 500 });
+    const record = await SoilService.findLatestByUserId(userId);
+    return ApiResponse(record).success();
+  } catch (error) {
+    console.error('Error in GET /api/soil:', error);
+    return ErrorException(
+      ApiErrorMessage.INTERNAL_SERVER_ERROR.value,
+      ApiErrorCode.INTERNAL_SERVER_ERROR.code
+    );
   }
 }
+

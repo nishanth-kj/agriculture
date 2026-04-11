@@ -1,27 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai'
 
-interface PestPredictionRequest {
-  message: string
-  cropType: string
-  location: string
-  observedSymptoms?: string[]
-  growthStage?: string
-  weather?: string
-}
-
-interface PestPredictionResponse {
-  prediction: string
-  confidenceLevel: string
-  preventionMethods: string[]
-  treatmentOptions: string[]
-  relatedPests?: string[]
-}
-
-interface ErrorResponse {
-  error: string
-  details?: string
-}
+import { PestPredictionRequest, PestPredictionResponse, ApiErrorResponse as ErrorResponse } from "@/types";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const model = genAI.getGenerativeModel({

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import db from '../../lib/drizzle';
 import * as dbSchema from '../schema';
 
@@ -10,9 +10,9 @@ async function main() {
   // 1. Seed Roles
   console.log('👥 Seeding roles...');
   const rolesToSeed = [
-    { name: 'ADMIN', status: 1 },
-    { name: 'FARMER', status: 1 },
-    { name: 'WORKER', status: 1 },
+    { id: 1, name: 'ADMIN', status: 1 },
+    { id: 2, name: 'FARMER', status: 1 },
+    { id: 3, name: 'WORKER', status: 1 },
   ];
 
   for (const r of rolesToSeed) {

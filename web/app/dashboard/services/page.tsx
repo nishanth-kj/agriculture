@@ -8,19 +8,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
-interface WeatherData {
-  location: { name: string; region: string };
-  current: { temp_c: number; condition: { text: string }; time: string };
-}
-
-interface MarketPriceEntry {
-  commodity: string;
-  value: number;
-  state?: string;
-  market?: string;
-  variety?: string;
-  arrival_date?: string;
-}
+import { WeatherData, MarketPriceEntry } from "@/types";
 
 const DATA_GOV_API_KEY = process.env.NEXT_PUBLIC_DATA_GOV_API_KEY;
 

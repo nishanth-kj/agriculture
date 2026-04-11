@@ -1,5 +1,7 @@
 "use client";
 
+import { api, CROPS, STATES, SEASONS } from '@/lib';
+import { SoilHealthInput, PredictionResponse, Crop } from '@/types';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,67 +9,36 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
-import { CROPS, STATES, SEASONS, CROP_SUGGESTIONS, Crop, State, Season } from '@/lib/constants';
 
-
-interface SoilData {
-  N: number;
-  P: number;
-  K: number;
-  pH: number;
-  EC: number;
-  OC: number;
-  S: number;
-  Zn: number;
-  Fe: number;
-  Cu: number;
-  Mn: number;
-  B: number;
-}
-interface PredictionResponse {
-  response: string;
-  yield_per_hectare?: string;
-  total_yield?: string;
-  profitability?: string;
-  techniques?: string;
-}
-
-// const states = ...
-// const seasons = ...
-// const cropSuggestions = ...
 
 export default function CropPredictionPage() {
-  const router = useRouter();
-  const [soilData, setSoilData] = React.useState<SoilData | null>(null);
+  const [soilData, setSoilData] = React.useState<SoilHealthInput | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<PredictionResponse | null>(null);
   const [manualQuestion, setManualQuestion] = React.useState('');
   const [formData, setFormData] = React.useState({
-    crop: CROPS[0],
-    season: SEASONS[0],
-    state: STATES[0],
+    crop: Object.values(CROPS)[0].value,
+    season: Object.values(SEASONS)[0].value,
+    state: Object.values(STATES)[0].value,
     area_hectares: 1,
   });
 
   React.useEffect(() => {
-    const fetchSoilData = async () => {
-      try {
-        const res = await fetch('/api/soil', { credentials: 'include' });
-        const data = await res.json();
-        if (data.success && data.data) {
-          setSoilData(data.data);
-        } else {
-          toast.error('Failed to load soil data');
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('Error loading soil data');
-      }
-    };
     fetchSoilData();
   }, []);
+
+  const fetchSoilData = async () => {
+    try {
+      // Standardized POST-only retrieval
+      const data = await api('/api/soil').post();
+      if (data) {
+        setSoilData(data);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Error loading soil data');
+    }
+  };
 
   const handleSubmit = async () => {
     if (!soilData) {
@@ -83,20 +54,19 @@ export default function CropPredictionPage() {
         custom_question: manualQuestion.trim(),
       };
 
-      const data = await fetchApi<PredictionResponse>('/prediction/predict/', payload, 'POST');
+      const data = await api('/api/prediction/predict/', payload).post();
 
       if (data.response) {
         setResult(data);
-        toast.success('  Prediction successful');
+        toast.success('Prediction successful');
       } else {
-        // Handle unexpected structure if necessary
         setResult(data);
-        toast.success('  Response received');
+        toast.success('Response received');
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message || '❌ Server error');
+      toast.error((err as Error).message || '❌ Server error');
     } finally {
       setLoading(false);
     }
@@ -112,14 +82,14 @@ export default function CropPredictionPage() {
           <Label className="mb-2 block">Crop</Label>
           <Select
             value={formData.crop}
-            onValueChange={(value) => setFormData({ ...formData, crop: value as Crop })}
+            onValueChange={(value) => setFormData({ ...formData, crop: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Crop" />
             </SelectTrigger>
             <SelectContent>
-              {CROPS.map((crop) => (
-                <SelectItem key={crop} value={crop}>{crop}</SelectItem>
+              {Object.values(CROPS).map((crop) => (
+                <SelectItem key={crop.code} value={crop.value}>{crop.value}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -128,14 +98,14 @@ export default function CropPredictionPage() {
           <Label className="mb-2 block">State</Label>
           <Select
             value={formData.state}
-            onValueChange={(value) => setFormData({ ...formData, state: value as State })}
+            onValueChange={(value) => setFormData({ ...formData, state: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select State" />
             </SelectTrigger>
             <SelectContent>
-              {STATES.map((state) => (
-                <SelectItem key={state} value={state}>{state}</SelectItem>
+              {Object.values(STATES).map((state) => (
+                <SelectItem key={state.code} value={state.value}>{state.value}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -144,14 +114,14 @@ export default function CropPredictionPage() {
           <Label className="mb-2 block">Season</Label>
           <Select
             value={formData.season}
-            onValueChange={(value) => setFormData({ ...formData, season: value as Season })}
+            onValueChange={(value) => setFormData({ ...formData, season: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Season" />
             </SelectTrigger>
             <SelectContent>
-              {SEASONS.map((season) => (
-                <SelectItem key={season} value={season}>{season}</SelectItem>
+              {Object.values(SEASONS).map((season) => (
+                <SelectItem key={season.code} value={season.value}>{season.value}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -176,8 +146,8 @@ export default function CropPredictionPage() {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, crop: e.target.value as Crop })}
           />
           <datalist id="suggestions">
-            {CROP_SUGGESTIONS.map((item) => (
-              <option key={item} value={item} />
+            {Object.values(CROPS).map((item) => (
+              <option key={item.value} value={item.value} />
             ))}
           </datalist>
         </div>
@@ -246,3 +216,4 @@ export default function CropPredictionPage() {
     </div>
   );
 }
+

@@ -2,7 +2,7 @@
 "use client";
 
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions } from "chart.js";
 
 // Register necessary chart components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -28,7 +28,7 @@ const Climate = () => {
     ],
   };
 
-  const options: any = {
+  const options: ChartOptions<"line"> = {
     responsive: true,
     plugins: {
       title: {

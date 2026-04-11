@@ -1,8 +1,8 @@
 'use client';
-//import { useRouter } from 'next/navigation';
-//import { cookies } from 'next/headers';
+
+import { apiRequest } from '@/lib';
+import { useEffect, useState, useCallback } from 'react';
 import LoginRequired from '@/components/LoginRequired/LoginRequired';
-import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,503 +10,209 @@ import {
 } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
 import {
-  Pagination, PaginationContent, PaginationItem, PaginationPrevious,
+  Pagination as PagingUI, PaginationContent, PaginationItem, PaginationPrevious,
   PaginationNext, PaginationLink,
 } from "@/components/ui/pagination";
 import toast from 'react-hot-toast';
-//import { set } from 'date-fns';
-
-const ITEMS_PER_PAGE = 5;
-
-interface Stock {
-  id: string;
-  name: string;
-  quantity: number;
-  location: string;
-  cost: number;
-  sellingPrice: number;
-  userId: string;
-  createdAt: string;
-}
-
-interface Worker {
-  id: string;
-  name: string;
-  role: string;
-  farm: string;
-  cost: number;
-  userId: string;
-  createdAt: string;
-}
+import { FaWarehouse, FaPlus, FaTrash, FaSync, FaSearch } from 'react-icons/fa';
+import { Stock } from '@/types';
 
 export default function ManagingPage() {
   const [stocks, setStocks] = useState<Stock[]>([]);
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [stockForm, setStockForm] = useState({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
-  const [workerForm, setWorkerForm] = useState({ name: '', role: '', farm: '' });
-  const [searchStock, setSearchStock] = useState('');
-  const [searchWorker, setSearchWorker] = useState('');
-  const [stockPage, setStockPage] = useState(1);
-  const [workerPage, setWorkerPage] = useState(1);
-
-  const filteredStocks = Array.isArray(stocks) ? stocks.filter(stock =>
-    stock.name.toLowerCase().includes(searchStock.toLowerCase())
-  ) : [];
-
-
-  const filteredWorkers = Array.isArray(workers) ? workers.filter(worker =>
-    worker.name.toLowerCase().includes(searchWorker.toLowerCase())
-  ) : [];
-
-  const totalStockQuantity = filteredStocks.reduce((sum, stock) => sum + stock.quantity, 0);
-  const totalStockProfit = filteredStocks.reduce((sum, stock) => sum + (stock.sellingPrice - stock.cost) * stock.quantity, 0);
-  const totalWorkerCost = filteredWorkers.reduce((sum, worker) => sum + worker.cost, 0);
-
+  const [form, setForm] = useState({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
 
-  //const router = useRouter();
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/auth/profile', {
-          method: 'GET',
-          credentials: 'include',
-        });
 
-        if (res.ok) {
-          setIsAuthenticated(true);
-          fetchData();
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Auth check failed", error);
-        setIsAuthenticated(false);
+  const checkAuth = useCallback(async () => {
+    try {
+      const result = await apiRequest('/api/auth/profile');
+      if (result) {
+        setIsAuthenticated(true);
+        loadData(1);
       }
-    };
-
-    checkAuth();
+    } catch {
+      setIsAuthenticated(false);
+    }
   }, []);
 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
-  // Helper function to get the cookie by name asynchronously
-  // const getCookie = async (name: string) => {
-  //   const value = `; ${document.cookie}`;
-  //   const parts = value.split(`; ${name}=`);
-  //   if (parts.length === 2) {
-  //     return parts.pop()?.split(';').shift() ?? null;
-  //   }
-  //   return null;
-  // };
-  const fetchData = async () => {
-    const stockRes = await fetch('/api/stocks');
-    const workerRes = await fetch('/api/workers');
-
-    const stockData = await stockRes.json();
-    const workerData = await workerRes.json();
-
-    setStocks(stockData);
-    setWorkers(workerData);
-  };
-
-  // if (isAuthenticated === false) {
-  //   router.push('/login');
-  //   return null;
-  // }
-  // Redirect after 1 second if not authenticated
-  const addStock = async () => {
-    const { name, quantity, location, cost, sellingPrice } = stockForm;
-    if (!name || !quantity || !location || !cost || !sellingPrice) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-
-    const res = await fetch('/api/stocks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        quantity: parseInt(quantity),
-        location,
-        cost: parseFloat(cost),
-        sellingPrice: parseFloat(sellingPrice),
-      }),
-    });
-
-    if (res.ok) {
-      toast.success('Stock added!');
-      setStockForm({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
-      fetchData();
-    } else toast.error('Failed to add stock.');
-  };
-
-  const addWorker = async () => {
-    const { name, role, farm } = workerForm;
-    if (!name || !role || !farm) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-
-    const res = await fetch('/api/workers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(workerForm),
-    });
-
-    if (res.ok) {
-      toast.success('Worker added!');
-      setWorkerForm({ name: '', role: '', farm: '' });
-      fetchData();
-    } else toast.error('Failed to add worker.');
-  };
-
-  const deleteStock = async (id: string) => {
-    const res = await fetch(`/api/stocks/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      toast.success('Deleted');
-    } else {
-      toast.error('Failed');
-    }
-    fetchData();
-  };
-
-  const deleteWorker = async (id: string) => {
-    const res = await fetch(`/api/workers/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      toast.success('Deleted');
-    } else {
-      toast.error('Failed');
-    }
-    fetchData();
-  };
-  const updateStock = async (id: string, quantity: number, cost: number, sellingPrice: number) => {
+  const loadData = async (pageNum: number) => {
+    setLoading(true);
     try {
-      const res = await fetch(`/api/stocks/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity, cost, sellingPrice }),
-      });
-
-      if (res.ok) {
-        toast.success("Stock updated!");
-        fetchData();
-      } else {
-        toast.error("Failed to update stock.");
-      }
-    } catch (error) {
-      toast.error("Error updating stock.");
-      console.error(error);
+      const data = await apiRequest('/api/stocks', { page: pageNum, size: 10 });
+      setStocks(data || []);
+      setPage(pageNum);
+    } catch {
+      toast.error('Failed to load inventory');
+    } finally {
+      setLoading(false);
     }
   };
-  const updateWorker = async (id: string, cost: number) => {
+
+  const handleUpsert = async (item?: Partial<Stock>) => {
     try {
-      const res = await fetch(`/api/workers/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cost }),
-      });
+      const payload = item?.id ? item : {
+        ...form,
+        quantity: parseInt(form.quantity),
+        cost: parseFloat(form.cost),
+        sellingPrice: parseFloat(form.sellingPrice)
+      };
 
-      if (res.ok) {
-        toast.success("Worker updated!");
-        fetchData(); // refresh data
-      } else {
-        toast.error("Failed to update worker.");
-      }
-    } catch (error) {
-      toast.error("Error updating worker.");
-      console.error(error);
+      await apiRequest('/api/stocks', payload);
+      toast.success(item?.id ? 'Record updated' : 'Item added');
+      setForm({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
+      loadData(page);
+    } catch (error: unknown) {
+      toast.error((error as Error).message);
     }
   };
 
-  const paginate = <T,>(data: T[], page: number): T[] =>
-    data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    try {
+      await apiRequest('/api/stocks', { id, status: 0 });
+      toast.success('Item deleted');
+      loadData(page);
+    } catch (error: unknown) {
+      toast.error((error as Error).message);
+    }
+  };
 
-  const totalStockPages = Math.ceil(filteredStocks.length / ITEMS_PER_PAGE);
-  const totalWorkerPages = Math.ceil(filteredWorkers.length / ITEMS_PER_PAGE);
-  //if (isAuthenticated === null) return <p className="text-center mt-10">Checking authentication...</p>;
+  if (isAuthenticated === false) return <LoginRequired />;
+  if (isAuthenticated === null) return null;
 
-  return isAuthenticated === null ? (
-    <div />
-  ) : isAuthenticated === false ? (
-    <LoginRequired />
-  ) : (
-    <div className="container mx-auto px-6 lg:px-12 py-12 space-y-12">
-      {/* STOCKS */}
-      <Card className="p-4 md:p-6 space-y-6">
-        <h2 className="text-2xl font-bold">Stocks Management</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-4">
-          <Input
-            placeholder="Name"
-            value={stockForm.name}
-            onChange={(e) => setStockForm({ ...stockForm, name: e.target.value })}
-          />
-          <Input
-            placeholder="Quantity"
-            type="number"
-            value={stockForm.quantity}
-            onChange={(e) => setStockForm({ ...stockForm, quantity: e.target.value })}
-          />
-          <Input
-            placeholder="Location"
-            value={stockForm.location}
-            onChange={(e) => setStockForm({ ...stockForm, location: e.target.value })}
-          />
-          <Input
-            placeholder="Cost"
-            type="number"
-            value={stockForm.cost}
-            onChange={(e) => setStockForm({ ...stockForm, cost: e.target.value })}
-          />
-          <Input
-            placeholder="Selling Price"
-            type="number"
-            value={stockForm.sellingPrice}
-            onChange={(e) => setStockForm({ ...stockForm, sellingPrice: e.target.value })}
-          />
-          <Button onClick={addStock}>Add Stock</Button>
+  return (
+    <div className="max-w-screen-xl mx-auto p-6 space-y-10 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
+            <FaWarehouse className="text-primary" /> Inventory Central
+          </h1>
+          <p className="text-muted-foreground mt-1">Manage global crop assets and warehouse logistics.</p>
         </div>
+      </div>
 
-        <Input
-          className="max-w-xs"
-          placeholder="Search Stock"
-          value={searchStock}
-          onChange={(e) => setSearchStock(e.target.value)}
-        />
-
-        <div className="overflow-x-auto -mx-4 px-4">
-          <div className="min-w-[800px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead>Selling Price</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginate(filteredStocks, stockPage).map((stock) => (
-                  <TableRow key={stock.id}>
-                    <TableCell>{stock.name}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={stock.quantity}
-                        onChange={(e) => {
-                          const updated = stocks.map((s) =>
-                            s.id === stock.id ? { ...s, quantity: parseInt(e.target.value) } : s
-                          );
-                          setStocks(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>{stock.location}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={stock.cost}
-                        onChange={(e) => {
-                          const updated = stocks.map((s) =>
-                            s.id === stock.id ? { ...s, cost: parseFloat(e.target.value) } : s
-                          );
-                          setStocks(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={stock.sellingPrice}
-                        onChange={(e) => {
-                          const updated = stocks.map((s) =>
-                            s.id === stock.id ? { ...s, sellingPrice: parseFloat(e.target.value) } : s
-                          );
-                          setStocks(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => updateStock(stock.id, stock.quantity, stock.cost, stock.sellingPrice)}
-                      >
-                        Update
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => deleteStock(stock.id)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+      {/* 🚀 New Entry Form Card */}
+      <Card className="p-8 bg-card/40 backdrop-blur-xl border-border/50 shadow-2xl rounded-3xl">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <FaPlus className="text-green-500" /> New Stock Entry
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase opacity-60 px-1">Product Name</label>
+            <Input className="bg-background/50" placeholder="e.g. Wheat" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase opacity-60 px-1">Quantity</label>
+            <Input className="bg-background/50" type="number" placeholder="0" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase opacity-60 px-1">Warehouse</label>
+            <Input className="bg-background/50" placeholder="A-101" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase opacity-60 px-1">Cost (₹)</label>
+            <Input className="bg-background/50" type="number" placeholder="0.00" value={form.cost} onChange={e => setForm({ ...form, cost: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase opacity-60 px-1">Price (₹)</label>
+            <Input className="bg-background/50" type="number" placeholder="0.00" value={form.sellingPrice} onChange={e => setForm({ ...form, sellingPrice: e.target.value })} />
+          </div>
+          <Button onClick={() => handleUpsert()} className="h-10 rounded-xl font-bold shadow-lg shadow-primary/20">
+            Submit Record
+          </Button>
         </div>
-
-        <div className="flex justify-between text-sm text-muted-foreground px-2 pt-4 border-t">
-          <p>Total Quantity: {totalStockQuantity}</p>
-          <p>Total Profit: ₹{totalStockProfit.toFixed(2)}</p>
-        </div>
-
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setStockPage((prev) => Math.max(prev - 1, 1));
-                }}
-              />
-            </PaginationItem>
-            {Array.from({ length: totalStockPages }).map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  href="#"
-                  isActive={stockPage === index + 1}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setStockPage(index + 1);
-                  }}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setStockPage((prev) => Math.min(prev + 1, totalStockPages));
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
       </Card>
 
-      {/* WORKERS */}
-      <Card className="p-4 md:p-6 space-y-6">
-        <h2 className="text-2xl font-bold">Workers Management</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <Input
-            placeholder="Name"
-            value={workerForm.name}
-            onChange={(e) => setWorkerForm({ ...workerForm, name: e.target.value })}
-          />
-          <Input
-            placeholder="Role"
-            value={workerForm.role}
-            onChange={(e) => setWorkerForm({ ...workerForm, role: e.target.value })}
-          />
-          <Input
-            placeholder="Farm"
-            value={workerForm.farm}
-            onChange={(e) => setWorkerForm({ ...workerForm, farm: e.target.value })}
-          />
-          <Button onClick={addWorker}>Add Worker</Button>
-        </div>
-
-        <Input
-          className="max-w-xs"
-          placeholder="Search Worker"
-          value={searchWorker}
-          onChange={(e) => setSearchWorker(e.target.value)}
-        />
-
-        <div className="overflow-x-auto -mx-4 px-4">
-          <div className="min-w-[600px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Farm</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginate(filteredWorkers, workerPage).map((worker) => (
-                  <TableRow key={worker.id}>
-                    <TableCell>{worker.name}</TableCell>
-                    <TableCell>{worker.role}</TableCell>
-                    <TableCell>{worker.farm}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={worker.cost}
-                        onChange={(e) => {
-                          const updated = workers.map((w) =>
-                            w.id === worker.id ? { ...w, cost: parseFloat(e.target.value) } : w
-                          );
-                          setWorkers(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button size="sm" onClick={() => updateWorker(worker.id, worker.cost)}>
-                        Update
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteWorker(worker.id)}>
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+      {/* 📊 Inventory Table */}
+      <Card className="overflow-hidden bg-card/40 backdrop-blur-xl border-border/50 shadow-2xl rounded-3xl">
+        <div className="p-6 border-b border-border/50 flex items-center justify-between bg-muted/20">
+          <div className="relative w-full max-w-sm">
+            <FaSearch className="absolute left-3 top-3 text-muted-foreground" />
+            <Input
+              placeholder="Search by product name..."
+              className="pl-10 bg-background/50 border-none rounded-full"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={() => loadData(page)} className="rounded-full">
+              <FaSync className={loading ? 'animate-spin' : ''} />
+            </Button>
           </div>
         </div>
 
-        <div className="flex justify-end text-sm text-muted-foreground px-2 pt-4 border-t">
-          <p>Total Worker Cost: ₹{totalWorkerCost.toFixed(2)}</p>
-        </div>
+        <Table>
+          <TableHeader className="bg-muted/30">
+            <TableRow className="border-border/50">
+              <TableHead className="font-bold">Product</TableHead>
+              <TableHead className="font-bold">Quantity</TableHead>
+              <TableHead className="font-bold">Location</TableHead>
+              <TableHead className="font-bold">Cost</TableHead>
+              <TableHead className="font-bold">Selling Price</TableHead>
+              <TableHead className="text-right font-bold px-6">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {stocks.length > 0 ? stocks.filter(s => s.name.toLowerCase().includes(search.toLowerCase())).map((stock) => (
+              <TableRow key={stock.id} className="hover:bg-primary/5 transition-colors border-border/50">
+                <TableCell className="font-bold text-lg">{stock.name}</TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    className="w-20 bg-background/40 border-none text-center"
+                    value={stock.quantity}
+                    onChange={e => {
+                      const val = parseInt(e.target.value);
+                      setStocks(prev => prev.map(s => s.id === stock.id ? { ...s, quantity: val } : s));
+                    }}
+                  />
+                </TableCell>
+                <TableCell className="text-muted-foreground">{stock.location}</TableCell>
+                <TableCell>₹{stock.cost}</TableCell>
+                <TableCell>₹{stock.sellingPrice}</TableCell>
+                <TableCell className="text-right px-6 space-x-2">
+                  <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/10" onClick={() => handleUpsert(stock)}>
+                    <FaSync />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10" onClick={() => handleDelete(stock.id)}>
+                    <FaTrash />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-20 opacity-40 italic">
+                  No stock records found in this warehouse.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
 
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setWorkerPage((prev) => Math.max(prev - 1, 1));
-                }}
-              />
-            </PaginationItem>
-            {Array.from({ length: totalWorkerPages }).map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  href="#"
-                  isActive={workerPage === index + 1}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setWorkerPage(index + 1);
-                  }}
-                >
-                  {index + 1}
-                </PaginationLink>
+        <div className="p-4 border-t border-border/50 bg-muted/10">
+          <PagingUI>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" onClick={e => { e.preventDefault(); if (page > 1) loadData(page - 1); }} />
               </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setWorkerPage((prev) => Math.min(prev + 1, totalWorkerPages));
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              <PaginationItem>
+                <PaginationLink href="#" isActive>{page}</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" onClick={e => { e.preventDefault(); loadData(page + 1); }} />
+              </PaginationItem>
+            </PaginationContent>
+          </PagingUI>
+        </div>
       </Card>
     </div>
   );

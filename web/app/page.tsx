@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Hero from "@/components/Hero/Hero";
 import Mission from "@/components/Mission/Mission";
 import HowItWorks from "@/components/HowItWorks/HowItWorks";

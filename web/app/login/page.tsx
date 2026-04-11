@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
 import { Input } from '@/components/ui/input'
@@ -11,7 +10,6 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 
 export default function LoginPage() {
-  const router = useRouter()
   const { login } = useAuth()
   const [form, setForm] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
@@ -31,8 +29,8 @@ export default function LoginPage() {
       await login(form)
       toast.success('Login successful')
       // router.push is handled inside login() in AuthContext
-    } catch (err: any) {
-      toast.error(err.message || 'Invalid credentials')
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Invalid credentials')
     } finally {
       setLoading(false)
     }

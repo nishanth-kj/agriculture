@@ -1,12 +1,25 @@
 'use client';
 
+import type { User } from '@/types';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, ChevronLeft, ChevronRight, Lock, Leaf, FlaskConical, Sprout, Bug, Menu } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { 
+    LayoutDashboard, 
+    Users, 
+    ChevronLeft, 
+    ChevronRight, 
+    Lock, 
+    Leaf, 
+    FlaskConical, 
+    Sprout, 
+    Bug, 
+    Menu 
+} from 'lucide-react';
+import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { motion } from 'framer-motion';
 import {
     Sheet,
     SheetContent,
@@ -16,7 +29,7 @@ import {
 interface SidebarContentProps {
     isCollapsed: boolean;
     pathname: string;
-    user: any;
+    user: User | null;
     logout: () => void;
     onItemClick?: () => void;
 }
@@ -159,25 +172,33 @@ export default function DashboardLayout({
                     isCollapsed ? "md:ml-[116px]" : "md:ml-[300px]" // Dynamic left margin
                 )}
             >
-                {/* Mobile Sidebar Toggle */}
+                {/* Mobile Sidebar Toggle - Optimized for visibility */}
                 <div className="md:hidden">
                     <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                         <SheetTrigger asChild>
                             <Button
                                 size="icon"
-                                className="fixed left-0 top-24 z-40 rounded-r-xl rounded-l-none h-10 w-8 bg-black/90 dark:bg-primary/90 hover:bg-black dark:hover:bg-primary shadow-md transition-all duration-300 ease-in-out active:scale-95"
+                                className="fixed left-6 bottom-10 z-[100] h-14 w-14 rounded-full bg-emerald-600 hover:bg-emerald-700 shadow-2xl shadow-emerald-500/40 text-white transition-all active:scale-90"
+                                aria-label="Open Menu"
                             >
-                                <ChevronRight className="w-5 h-5 text-white" />
+                                <Menu className="w-6 h-6" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="left" className="p-0 border-r border-border bg-card w-[280px]">
-                            <SidebarContent
-                                isCollapsed={false}
-                                pathname={pathname}
-                                user={user}
-                                logout={logout}
-                                onItemClick={() => setIsMobileOpen(false)}
-                            />
+                        <SheetContent side="left" className="p-0 border-r border-border bg-card w-[280px] rounded-r-[32px] overflow-hidden">
+                            <motion.div 
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full"
+                            >
+                                <SidebarContent
+                                    isCollapsed={false}
+                                    pathname={pathname}
+                                    user={user}
+                                    logout={logout}
+                                    onItemClick={() => setIsMobileOpen(false)}
+                                />
+                            </motion.div>
                         </SheetContent>
                     </Sheet>
                 </div>
@@ -190,3 +211,4 @@ export default function DashboardLayout({
         </div>
     );
 }
+

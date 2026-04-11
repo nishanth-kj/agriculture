@@ -21,7 +21,7 @@ export default function HowItWorks() {
                         </div>
                         <h3 className="text-xl font-semibold mb-2 dark:text-white">Smart Crop Prediction</h3>
                         <p className="text-muted-foreground dark:text-gray-400 text-sm">
-                            Analyze soil data like Nitrogen, Phosphorus, Potassium, and pH levels to recommend the perfect crops for your land's specific conditions.
+                            Analyze soil data like Nitrogen, Phosphorus, Potassium, and pH levels to recommend the perfect crops for your land&apos;s specific conditions.
                         </p>
                     </div>
 
@@ -32,7 +32,7 @@ export default function HowItWorks() {
                         </div>
                         <h3 className="text-xl font-semibold mb-2 dark:text-white">Soil Health Monitoring</h3>
                         <p className="text-muted-foreground dark:text-gray-400 text-sm">
-                            Get detailed insights into your soil's health status. We assess nutrient levels and provide recommendations to maintain optimal fertility.
+                            Get detailed insights into your soil&apos;s health status. We assess nutrient levels and provide recommendations to maintain optimal fertility.
                         </p>
                     </div>
 

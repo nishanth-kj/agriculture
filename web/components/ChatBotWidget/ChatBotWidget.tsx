@@ -4,17 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bot, User as UserIcon, LogIn } from 'lucide-react'
 
-interface Message {
-  sender: 'user' | 'bot'
-  text: string
-  timestamp: Date
-}
-
-interface User {
-  name: string
-  email: string
-  avatar?: string
-}
+import { ChatBotMessage as Message } from '@/types';
 
 import { useAuth } from '@/context/AuthContext'
 
@@ -43,7 +33,7 @@ export default function ChatBotWidget() {
               ...prev,
               {
                 sender: 'bot',
-                text: `🌿 Hi ${user.name}, I'm AgriBot — your agriculture assistant! Ask me anything about crops, soil, or farming.`,
+                text: `🌿 Hi ${user.name}, I&apos;m AgriBot — your agriculture assistant! Ask me anything about crops, soil, or farming.`,
                 timestamp: new Date()
               }
             ];

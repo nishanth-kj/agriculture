@@ -2,12 +2,18 @@
 "use client";
 
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions } from "chart.js";
 
 // Register necessary chart components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const Price = (props: any) => {
+import { PriceProps } from "@/types";
+
+const Price = ({ data: marketData }: PriceProps) => {
+  // We can use the passed marketData to update the chart, 
+  // but for now we follow existing logic with static labels and dynamic mapping.
+  console.log('Price data received:', marketData);
+  
   const data = {
     labels: ["2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4", "2022 Q1", "2022 Q2"], // Example data labels (quarters)
     datasets: [
@@ -21,7 +27,7 @@ const Price = (props: any) => {
     ],
   };
 
-  const options: any = {
+  const options: ChartOptions<"line"> = {
     responsive: true,
     plugins: {
       title: {

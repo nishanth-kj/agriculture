@@ -1,23 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import { api } from '@/lib/api/apiclient';
 import { useRouter } from 'next/navigation';
 
-interface User {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-}
-
-interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    login: (credentials: any) => Promise<void>;
-    register: (data: any) => Promise<void>;
-    logout: () => Promise<void>;
-}
+import { User, AuthContextType } from '@/types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -29,11 +16,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const res = await axios.get('/api/auth/me');
-                if (res.data.status === 1) {
-                    setUser(res.data.data);
+                const data = await api('/api/auth/me').post();
+                if (data) {
+                    setUser(data as User);
                 }
-            } catch (err) {
+            } catch {
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -42,33 +29,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initAuth();
     }, []);
 
-    const login = async (credentials: any) => {
+    const login = async (credentials: unknown) => {
         try {
-            const res = await axios.post('/api/auth/login', credentials);
-            if (res.data.status === 1) {
-                setUser(res.data.data);
-                router.push('/dashboard'); // or wherever
+            const data = await api('/api/auth/login', credentials).post();
+            if (data) {
+                setUser(data as User);
+                router.push('/dashboard');
             }
-        } catch (err: any) {
-            throw new Error(err.response?.data?.message || 'Login failed');
+        } catch (err: unknown) {
+            throw new Error((err as Error).message || 'Login failed');
         }
     };
 
-    const register = async (data: any) => {
+    const register = async (data: unknown) => {
         try {
-            const res = await axios.post('/api/auth/register', data);
-            if (res.data.status === 1) {
-                setUser(res.data.data);
+            const resData = await api('/api/auth/register', data).post();
+            if (resData) {
+                setUser(resData as User);
                 router.push('/dashboard');
             }
-        } catch (err: any) {
-            throw new Error(err.response?.data?.message || 'Registration failed');
+        } catch (err: unknown) {
+            throw new Error((err as Error).message || 'Registration failed');
         }
     };
 
     const logout = async () => {
         try {
-            await axios.delete('/api/auth/me');
+            await api('/api/auth/logout').post();
             setUser(null);
             router.push('/login');
         } catch (err) {

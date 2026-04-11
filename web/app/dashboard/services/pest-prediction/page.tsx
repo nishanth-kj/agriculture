@@ -1,5 +1,7 @@
 "use client"
 
+import { api, GROWTH_STAGES, WEATHER_OPTIONS, CROPS } from '@/lib';
+import { PestFormData, PestPredictionResult } from '@/types';
 import { useState } from 'react'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,30 +9,21 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
-import { GROWTH_STAGES, WEATHER_OPTIONS } from '@/lib/constants';
+import { Badge } from '@/components/ui/badge';
+import { FaNotesMedical, FaTractor, FaSync } from 'react-icons/fa';
 
-interface PestFormData {
-  message: string;
-  cropType: string;
-  location: string;
-  observedSymptoms: string;
-  growthStage: string;
-  weather: string;
-  [key: string]: string;
-}
-
-interface PestPredictionResult {
-  prediction: string;
-  confidenceLevel: string;
-  preventionMethods?: string[];
-  treatmentOptions?: string[];
-  relatedPests?: string[];
-}
+const symptoms = [
+  'Yellow Leaves',
+  'Stunted Growth',
+  'Wilting',
+  'Fruit Rot',
+  'Leaf Spots',
+  'Holes in Leaves',
+  'Powdery Mildew',
+  'Root Rot'
+];
 
 export default function PestPredictionForm() {
-  const router = useRouter();
   const [formData, setFormData] = useState<PestFormData>({
     message: '',
     cropType: '',
@@ -45,7 +38,7 @@ export default function PestPredictionForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev: PestFormData) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,16 +50,16 @@ export default function PestPredictionForm() {
     try {
       const payload = {
         ...formData,
-        observedSymptoms: formData.observedSymptoms.split(',').map(s => s.trim())
+        observedSymptoms: formData.observedSymptoms.split(',').map((s: string) => s.trim())
       };
 
-      const data = await fetchApi<PestPredictionResult>('/prediction/pest-predict/', payload, 'POST');
+      const data = await api('/prediction/pest-predict/', payload).post();
       if (data) {
-        setPrediction(data);
+        setPrediction(data as PestPredictionResult);
       }
 
-    } catch (err: any) {
-      setError(err.message || 'Prediction error')
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Prediction error')
     } finally {
       setLoading(false)
     }
@@ -84,14 +77,14 @@ export default function PestPredictionForm() {
             <Label className="mb-2 block">Crop Type*</Label>
             <Select
               value={formData.cropType}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, cropType: value }))}
+              onValueChange={(value: string) => setFormData((prev: PestFormData) => ({ ...prev, cropType: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select Crop" />
               </SelectTrigger>
               <SelectContent>
-                {['Rice', 'Wheat', 'Maize', 'Cotton', 'Sugarcane'].map(crop => (
-                  <SelectItem key={crop} value={crop.toLowerCase()}>{crop}</SelectItem>
+                {Object.values(CROPS).map((crop) => (
+                  <SelectItem key={crop.code} value={crop.value}>{crop.value}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -116,14 +109,14 @@ export default function PestPredictionForm() {
             <Label className="mb-2 block">Growth Stage</Label>
             <Select
               value={formData.growthStage}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, growthStage: value }))}
+              onValueChange={(value: string) => setFormData((prev: PestFormData) => ({ ...prev, growthStage: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select Stage" />
               </SelectTrigger>
               <SelectContent>
-                {GROWTH_STAGES.map(stage => (
-                  <SelectItem key={stage} value={stage.toLowerCase()}>{stage}</SelectItem>
+                {Object.values(GROWTH_STAGES).map((stage) => (
+                  <SelectItem key={stage.code} value={stage.value.toLowerCase()}>{stage.value}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -133,14 +126,14 @@ export default function PestPredictionForm() {
             <Label className="mb-2 block">Weather</Label>
             <Select
               value={formData.weather}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, weather: value }))}
+              onValueChange={(value: string) => setFormData((prev: PestFormData) => ({ ...prev, weather: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select Weather" />
               </SelectTrigger>
               <SelectContent>
-                {WEATHER_OPTIONS.map(w => (
-                  <SelectItem key={w} value={w.toLowerCase()}>{w}</SelectItem>
+                {Object.values(WEATHER_OPTIONS).map((w) => (
+                  <SelectItem key={w.code} value={w.value.toLowerCase()}>{w.value}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -162,6 +155,23 @@ export default function PestPredictionForm() {
 
         <div>
           <Label className="mb-2 block">Observed Symptoms</Label>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {symptoms.map((s: string) => (
+              <Badge
+                key={s}
+                variant={formData.observedSymptoms.includes(s) ? 'default' : 'outline'}
+                className="cursor-pointer rounded-full px-4 py-1 font-bold transition-all"
+                onClick={() => setFormData((prev: PestFormData) => ({
+                  ...prev,
+                  observedSymptoms: prev.observedSymptoms.includes(s)
+                    ? prev.observedSymptoms.split(', ').filter((item: string) => item !== s).join(', ')
+                    : prev.observedSymptoms ? `${prev.observedSymptoms}, ${s}` : s
+                }))}
+              >
+                {s}
+              </Badge>
+            ))}
+          </div>
           <Input
             type="text"
             name="observedSymptoms"
@@ -192,40 +202,52 @@ export default function PestPredictionForm() {
       {/* Results */}
       {prediction && (
         <div className="mt-8 bg-white p-6 rounded-2xl shadow-lg border transition-all">
-          <h2 className="text-2xl font-bold mb-4 text-green-700">PEDICTION RESULT</h2>
+          <h2 className="text-2xl font-bold mb-4 text-emerald-700 flex items-center gap-2">
+            <FaSync className="animate-pulse" /> PREDICTION RESULT
+          </h2>
 
           <div className="mb-4">
-            <h3 className="font-semibold">Identified Pest:</h3>
-            <p className="whitespace-pre-line">{prediction.prediction}</p>
-            <p className="text-sm text-gray-600">Confidence: <strong>{prediction.confidenceLevel}</strong></p>
+            <h3 className="font-semibold text-slate-700">Identified Pest:</h3>
+            <p className="whitespace-pre-line text-lg font-bold">{prediction.prediction}</p>
+            <Badge variant="secondary" className="mt-2 rounded-full">Confidence: {prediction.confidenceLevel}</Badge>
           </div>
 
           {prediction.preventionMethods && prediction.preventionMethods.length > 0 && (
-            <div className="mb-4">
-              <h3 className="font-semibold">Prevention Methods:</h3>
-              <ul className="list-disc pl-5">
-                {prediction.preventionMethods?.map((method, i) => <li key={i}>{method}</li>)}
+            <div className="mb-6">
+              <h3 className="font-semibold text-slate-700 mb-2">Prevention Methods:</h3>
+              <ul className="space-y-2">
+                {prediction.preventionMethods.map((method: string, i: number) => (
+                  <li key={i} className="flex gap-4 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 items-start">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
+                    <p className="text-sm font-medium leading-relaxed">{method}</p>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
 
           {prediction.treatmentOptions && prediction.treatmentOptions.length > 0 && (
-            <div className="mb-4">
-              <h3 className="font-semibold">Treatment Options:</h3>
-              <ul className="list-disc pl-5">
-                {prediction.treatmentOptions?.map((opt, i) => <li key={i}>{opt}</li>)}
+            <div className="mb-6">
+              <h3 className="font-semibold text-slate-700 mb-2">Treatment Options:</h3>
+              <ul className="space-y-2">
+                {prediction.treatmentOptions.map((opt: string, i: number) => (
+                  <li key={i} className="flex gap-4 p-4 rounded-2xl bg-sky-500/5 border border-sky-500/10 items-start">
+                    <FaTractor className="text-sky-500 mt-1 flex-shrink-0" />
+                    <p className="text-sm font-medium leading-relaxed">{opt}</p>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
 
           {prediction.relatedPests && prediction.relatedPests.length > 0 && (
             <div>
-              <h3 className="font-semibold">Related Pests:</h3>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {prediction.relatedPests?.map((pest, i) => (
-                  <span key={i} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    {pest}
-                  </span>
+              <h3 className="font-semibold text-slate-700 mb-2">Related Pests:</h3>
+              <div className="flex flex-wrap gap-2">
+                {prediction.relatedPests.map((p: string, i: number) => (
+                  <Badge key={i} className="bg-red-500/10 text-red-600 border-red-500/20 rounded-full py-1 px-4 font-bold flex gap-2 items-center">
+                    <FaNotesMedical /> {p}
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -235,3 +257,4 @@ export default function PestPredictionForm() {
     </div>
   )
 }
+

@@ -1,467 +1,305 @@
 'use client';
+
+import { api } from '@/lib';
 import { useAuth } from '@/context/AuthContext';
 import LoginRequired from '@/components/LoginRequired/LoginRequired';
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
-import {
-  Pagination, PaginationContent, PaginationItem, PaginationPrevious,
-  PaginationNext, PaginationLink,
-} from "@/components/ui/pagination";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
+import {
+    FaBox, FaUsers, FaPlus, FaTrash, FaSync, FaSearch,
+    FaIdBadge, FaEnvelope, FaTractor
+} from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Stock, Worker } from '@/types';
 
-const ITEMS_PER_PAGE = 5;
+export default function ManagingDashboard() {
+    const { user, loading: authLoading } = useAuth();
+    const [stocks, setStocks] = useState<Stock[]>([]);
+    const [workers, setWorkers] = useState<Worker[]>([]);
+    const [loading, setLoading] = useState(true);
 
-interface Stock {
-  id: string;
-  name: string;
-  quantity: number;
-  location: string;
-  cost: number;
-  sellingPrice: number;
-  userId: string;
-  createdAt: string;
-}
+    // Forms
+    const [stockForm, setStockForm] = useState({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
+    const [workerForm, setWorkerForm] = useState({ name: '', email: '', username: '', farm: '', role: '' });
 
-interface Worker {
-  id: string;
-  name: string;
-  role: string;
-  farm: string;
-  cost: number;
-  userId: string;
-  createdAt: string;
-}
+    // Search
+    const [stockSearch, setStockSearch] = useState('');
+    const [workerSearch, setWorkerSearch] = useState('');
 
-export default function ManagingPage() {
-  const { user, loading } = useAuth();
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [stockForm, setStockForm] = useState({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
-  const [workerForm, setWorkerForm] = useState({ name: '', role: '', farm: '' });
-  const [searchStock, setSearchStock] = useState('');
-  const [searchWorker, setSearchWorker] = useState('');
-  const [stockPage, setStockPage] = useState(1);
-  const [workerPage, setWorkerPage] = useState(1);
+    useEffect(() => {
+        if (user) fetchData();
+    }, [user]);
 
-  const filteredStocks = Array.isArray(stocks) ? stocks.filter(stock =>
-    stock.name.toLowerCase().includes(searchStock.toLowerCase())
-  ) : [];
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [stockRes, workerRes] = await Promise.all([
+                api('/api/stocks', { page: 1, size: 50 }).post(),
+                api('/api/workers', { page: 1, size: 50 }).post()
+            ]);
+            setStocks((stockRes as Stock[]) || []);
+            setWorkers((workerRes as Worker[]) || []);
+        } catch {
+            toast.error("Sync failed");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const handleAddStock = async () => {
+        try {
+            await api('/api/stocks', {
+                ...stockForm,
+                quantity: Number(stockForm.quantity),
+                cost: stockForm.cost,
+                sellingPrice: stockForm.sellingPrice
+            }).post();
+            toast.success("Stock Added");
+            setStockForm({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
+            fetchData();
+        } catch {
+            toast.error("Failed to add stock");
+        }
+    };
 
-  const filteredWorkers = Array.isArray(workers) ? workers.filter(worker =>
-    worker.name.toLowerCase().includes(searchWorker.toLowerCase())
-  ) : [];
+    const handleAddWorker = async () => {
+        try {
+            await api('/api/workers', workerForm).post();
+            toast.success("Worker Account Created");
+            setWorkerForm({ name: '', email: '', username: '', farm: '', role: '' });
+            fetchData();
+        } catch (err) {
+            toast.error((err as Error).message || "Failed to create worker");
+        }
+    };
 
-  const totalStockQuantity = filteredStocks.reduce((sum, stock) => sum + stock.quantity, 0);
-  const totalStockProfit = filteredStocks.reduce((sum, stock) => sum + (stock.sellingPrice - stock.cost) * stock.quantity, 0);
-  const totalWorkerCost = filteredWorkers.reduce((sum, worker) => sum + worker.cost, 0);
+    const handleDelete = async (type: 'stocks' | 'workers', id: number) => {
+        try {
+            await api(`/api/${type}`, { id, status: 0 }).post();
+            toast.success("Deleted successfully");
+            fetchData();
+        } catch {
+            toast.error("Delete failed");
+        }
+    };
 
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
+    if (authLoading) return null;
+    if (!user) return <LoginRequired />;
 
-  const fetchData = async () => {
-    try {
-      const stockRes = await fetch('/api/stocks');
-      const workerRes = await fetch('/api/workers');
+    return (
+        <div className="space-y-10 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-sky-500">
+                        Resource Control
+                    </h1>
+                    <p className="text-muted-foreground font-medium">Manage your physical assets and workforce from a unified command center.</p>
+                </div>
+                <Button onClick={fetchData} variant="outline" className="rounded-full gap-2 backdrop-blur-md">
+                    <FaSync className={loading ? "animate-spin" : ""} /> Sync Data
+                </Button>
+            </div>
 
-      const stockData = await stockRes.json();
-      const workerData = await workerRes.json();
+            <Tabs defaultValue="inventory" className="w-full">
+                <TabsList className="bg-muted/50 p-1 rounded-2xl mb-8 space-x-2">
+                    <TabsTrigger value="inventory" className="rounded-xl px-8 font-bold data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all">
+                        <FaBox className="mr-2" /> Inventory
+                    </TabsTrigger>
+                    <TabsTrigger value="labour" className="rounded-xl px-8 font-bold data-[state=active]:bg-sky-600 data-[state=active]:text-white transition-all">
+                        <FaUsers className="mr-2" /> Labour
+                    </TabsTrigger>
+                </TabsList>
 
-      setStocks(Array.isArray(stockData) ? stockData : []);
-      setWorkers(Array.isArray(workerData) ? workerData : []);
-    } catch (error) {
-      console.error("Failed to fetch data", error);
-      toast.error("Failed to load data");
-    }
-  };
+                {/* INVENTORY SECTION */}
+                <TabsContent value="inventory" className="space-y-8 outline-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* Add Form */}
+                        <Card className="p-6 col-span-1 bg-card/40 backdrop-blur-xl border-emerald-500/20 shadow-xl rounded-[2rem] h-fit">
+                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-emerald-600">
+                                <FaPlus /> Add Asset
+                            </h2>
+                            <div className="space-y-4">
+                                <Input placeholder="Item Name" value={stockForm.name} onChange={e => setStockForm({ ...stockForm, name: e.target.value })} className="rounded-xl" />
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Input placeholder="Qty" type="number" value={stockForm.quantity} onChange={e => setStockForm({ ...stockForm, quantity: e.target.value })} className="rounded-xl" />
+                                    <Input placeholder="Loc" value={stockForm.location} onChange={e => setStockForm({ ...stockForm, location: e.target.value })} className="rounded-xl" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Input placeholder="Cost (₹)" value={stockForm.cost} onChange={e => setStockForm({ ...stockForm, cost: e.target.value })} className="rounded-xl" />
+                                    <Input placeholder="Sale (₹)" value={stockForm.sellingPrice} onChange={e => setStockForm({ ...stockForm, sellingPrice: e.target.value })} className="rounded-xl" />
+                                </div>
+                                <Button onClick={handleAddStock} className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/20">
+                                    Register Item
+                                </Button>
+                            </div>
+                        </Card>
 
-  // if (isAuthenticated === false) {
-  //   router.push('/login');
-  //   return null;
-  // }
-  // Redirect after 1 second if not authenticated
-  const addStock = async () => {
-    const { name, quantity, location, cost, sellingPrice } = stockForm;
-    if (!name || !quantity || !location || !cost || !sellingPrice) {
-      toast.error('Please fill in all fields');
-      return;
-    }
+                        {/* List View */}
+                        <Card className="p-8 col-span-1 lg:col-span-3 bg-card/60 backdrop-blur-xl border-border/50 shadow-2xl rounded-[2rem]">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="relative w-full max-w-sm">
+                                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search inventory..."
+                                        className="pl-12 rounded-full bg-background/50 border-none ring-1 ring-border shadow-inner"
+                                        value={stockSearch}
+                                        onChange={e => setStockSearch(e.target.value)}
+                                    />
+                                </div>
+                            </div>
 
-    const res = await fetch('/api/stocks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        quantity: parseInt(quantity),
-        location,
-        cost: parseFloat(cost),
-        sellingPrice: parseFloat(sellingPrice),
-      }),
-    });
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-border/50 hover:bg-transparent">
+                                        <TableHead className="font-bold">ITEM</TableHead>
+                                        <TableHead className="font-bold">STATUS</TableHead>
+                                        <TableHead className="font-bold">QUANTITY</TableHead>
+                                        <TableHead className="font-bold">VALUATION</TableHead>
+                                        <TableHead className="text-right font-bold">ACTION</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <AnimatePresence>
+                                        {stocks.filter((s: Stock) => s.name.toLowerCase().includes(stockSearch.toLowerCase())).map((stock: Stock) => (
+                                            <motion.tr
+                                                key={stock.id}
+                                                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                                className="group border-border/40 hover:bg-emerald-500/5 transition-all"
+                                            >
+                                                <TableCell className="font-bold text-lg">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                                        {stock.name}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 rounded-full">Active</Badge>
+                                                </TableCell>
+                                                <TableCell className="font-mono">{stock.quantity} Units</TableCell>
+                                                <TableCell className="font-bold">₹{stock.sellingPrice}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        onClick={() => handleDelete('stocks', stock.id)}
+                                                        variant="ghost" size="icon"
+                                                        className="rounded-full hover:bg-red-500/10 hover:text-red-500"
+                                                    >
+                                                        <FaTrash />
+                                                    </Button>
+                                                </TableCell>
+                                            </motion.tr>
+                                        ))}
+                                    </AnimatePresence>
+                                </TableBody>
+                            </Table>
+                        </Card>
+                    </div>
+                </TabsContent>
 
-    if (res.ok) {
-      toast.success('Stock added!');
-      setStockForm({ name: '', quantity: '', location: '', cost: '', sellingPrice: '' });
-      fetchData();
-    } else toast.error('Failed to add stock.');
-  };
+                {/* LABOUR SECTION */}
+                <TabsContent value="labour" className="space-y-8 outline-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        {/* Add Form */}
+                        <Card className="p-6 col-span-1 bg-card/40 backdrop-blur-xl border-sky-500/20 shadow-xl rounded-[2rem] h-fit">
+                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-sky-600">
+                                <FaIdBadge /> Hire Worker
+                            </h2>
+                            <div className="space-y-4">
+                                <Input placeholder="Full Name" value={workerForm.name} onChange={e => setWorkerForm({ ...workerForm, name: e.target.value })} className="rounded-xl" />
+                                <Input placeholder="Email Address" value={workerForm.email} onChange={e => setWorkerForm({ ...workerForm, email: e.target.value })} className="rounded-xl" />
+                                <Input placeholder="Username (Optional)" value={workerForm.username} onChange={e => setWorkerForm({ ...workerForm, username: e.target.value })} className="rounded-xl" />
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Input placeholder="Farm name" value={workerForm.farm} onChange={e => setWorkerForm({ ...workerForm, farm: e.target.value })} className="rounded-xl" />
+                                    <Input placeholder="Role (Driver, etc)" value={workerForm.role} onChange={e => setWorkerForm({ ...workerForm, role: e.target.value })} className="rounded-xl" />
+                                </div>
+                                <div className="p-3 bg-sky-500/10 rounded-xl border border-sky-500/20 text-[10px] text-sky-700 font-bold uppercase tracking-widest leading-relaxed">
+                                    ⚠️ Creating a worker will generate a user account with role &quot;WORKER&quot; and default password &quot;Welcome@123&quot;.
+                                </div>
+                                <Button onClick={handleAddWorker} className="w-full rounded-xl bg-sky-600 hover:bg-sky-700 shadow-lg shadow-sky-500/20">
+                                    Onboard Worker
+                                </Button>
+                            </div>
+                        </Card>
 
-  const addWorker = async () => {
-    const { name, role, farm } = workerForm;
-    if (!name || !role || !farm) {
-      toast.error('Please fill in all fields');
-      return;
-    }
+                        {/* List View */}
+                        <Card className="p-8 col-span-1 lg:col-span-3 bg-card/60 backdrop-blur-xl border-border/50 shadow-2xl rounded-[2rem]">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="relative w-full max-w-sm">
+                                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search workforce..."
+                                        className="pl-12 rounded-full bg-background/50 border-none ring-1 ring-border shadow-inner"
+                                        value={workerSearch}
+                                        onChange={e => setWorkerSearch(e.target.value)}
+                                    />
+                                </div>
+                            </div>
 
-    const res = await fetch('/api/workers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(workerForm),
-    });
-
-    if (res.ok) {
-      toast.success('Worker added!');
-      setWorkerForm({ name: '', role: '', farm: '' });
-      fetchData();
-    } else toast.error('Failed to add worker.');
-  };
-
-  const deleteStock = async (id: string) => {
-    const res = await fetch(`/api/stocks/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      toast.success('Deleted');
-    } else {
-      toast.error('Failed');
-    }
-    fetchData();
-  };
-
-  const deleteWorker = async (id: string) => {
-    const res = await fetch(`/api/workers/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      toast.success('Deleted');
-    } else {
-      toast.error('Failed');
-    }
-    fetchData();
-  };
-  const updateStock = async (id: string, quantity: number, cost: number, sellingPrice: number) => {
-    try {
-      const res = await fetch(`/api/stocks/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity, cost, sellingPrice }),
-      });
-
-      if (res.ok) {
-        toast.success("Stock updated!");
-        fetchData();
-      } else {
-        toast.error("Failed to update stock.");
-      }
-    } catch (error) {
-      toast.error("Error updating stock.");
-      console.error(error);
-    }
-  };
-  const updateWorker = async (id: string, cost: number) => {
-    try {
-      const res = await fetch(`/api/workers/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cost }),
-      });
-
-      if (res.ok) {
-        toast.success("Worker updated!");
-        fetchData(); // refresh data
-      } else {
-        toast.error("Failed to update worker.");
-      }
-    } catch (error) {
-      toast.error("Error updating worker.");
-      console.error(error);
-    }
-  };
-
-  const paginate = <T,>(data: T[], page: number): T[] =>
-    data.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-
-  const totalStockPages = Math.ceil(filteredStocks.length / ITEMS_PER_PAGE);
-  const totalWorkerPages = Math.ceil(filteredWorkers.length / ITEMS_PER_PAGE);
-
-  if (loading) return <div />;
-
-  return !user ? (
-    <LoginRequired />
-  ) : (
-    <div className="container mx-auto px-6 lg:px-12 py-12 space-y-12">
-      {/* STOCKS */}
-      <Card className="p-4 md:p-6 space-y-6">
-        <h2 className="text-2xl font-bold">Stocks Management</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-4">
-          <Input
-            placeholder="Name"
-            value={stockForm.name}
-            onChange={(e) => setStockForm({ ...stockForm, name: e.target.value })}
-          />
-          <Input
-            placeholder="Quantity"
-            type="number"
-            value={stockForm.quantity}
-            onChange={(e) => setStockForm({ ...stockForm, quantity: e.target.value })}
-          />
-          <Input
-            placeholder="Location"
-            value={stockForm.location}
-            onChange={(e) => setStockForm({ ...stockForm, location: e.target.value })}
-          />
-          <Input
-            placeholder="Cost"
-            type="number"
-            value={stockForm.cost}
-            onChange={(e) => setStockForm({ ...stockForm, cost: e.target.value })}
-          />
-          <Input
-            placeholder="Selling Price"
-            type="number"
-            value={stockForm.sellingPrice}
-            onChange={(e) => setStockForm({ ...stockForm, sellingPrice: e.target.value })}
-          />
-          <Button onClick={addStock}>Add Stock</Button>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-border/50 hover:bg-transparent">
+                                        <TableHead className="font-bold">WORKER</TableHead>
+                                        <TableHead className="font-bold">ROLE & FARM</TableHead>
+                                        <TableHead className="font-bold">CONTACT</TableHead>
+                                        <TableHead className="text-right font-bold">ACTION</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <AnimatePresence>
+                                        {workers.filter((w: Worker) => w.user && w.user.name && w.user.name.toLowerCase().includes(workerSearch.toLowerCase())).map((worker: Worker) => (
+                                            <motion.tr
+                                                key={worker.id}
+                                                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                                className="group border-border/40 hover:bg-sky-500/5 transition-all"
+                                            >
+                                                <TableCell>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-600 font-black">
+                                                            {worker.user.name[0]}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-lg leading-none mb-1">{worker.user.name}</p>
+                                                            <p className="text-xs text-muted-foreground font-medium">@{worker.user.username}</p>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <FaTractor className="text-sky-500" />
+                                                        <span className="font-bold">{worker.role || 'General'}</span>
+                                                        <span className="text-muted-foreground">at</span>
+                                                        <Badge variant="secondary" className="rounded-full">{worker.farm || 'Global'}</Badge>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                        <FaEnvelope /> {worker.user.email}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        onClick={() => handleDelete('workers', worker.id)}
+                                                        variant="ghost" size="icon"
+                                                        className="rounded-full hover:bg-red-500/10 hover:text-red-500"
+                                                    >
+                                                        <FaTrash />
+                                                    </Button>
+                                                </TableCell>
+                                            </motion.tr>
+                                        ))}
+                                    </AnimatePresence>
+                                </TableBody>
+                            </Table>
+                        </Card>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
-
-        <Input
-          className="max-w-xs"
-          placeholder="Search Stock"
-          value={searchStock}
-          onChange={(e) => setSearchStock(e.target.value)}
-        />
-
-        <div className="overflow-x-auto -mx-4 px-4">
-          <div className="min-w-[800px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead>Selling Price</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginate(filteredStocks, stockPage).map((stock) => (
-                  <TableRow key={stock.id}>
-                    <TableCell>{stock.name}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={stock.quantity}
-                        onChange={(e) => {
-                          const updated = stocks.map((s) =>
-                            s.id === stock.id ? { ...s, quantity: parseInt(e.target.value) } : s
-                          );
-                          setStocks(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>{stock.location}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={stock.cost}
-                        onChange={(e) => {
-                          const updated = stocks.map((s) =>
-                            s.id === stock.id ? { ...s, cost: parseFloat(e.target.value) } : s
-                          );
-                          setStocks(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={stock.sellingPrice}
-                        onChange={(e) => {
-                          const updated = stocks.map((s) =>
-                            s.id === stock.id ? { ...s, sellingPrice: parseFloat(e.target.value) } : s
-                          );
-                          setStocks(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => updateStock(stock.id, stock.quantity, stock.cost, stock.sellingPrice)}
-                      >
-                        Update
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => deleteStock(stock.id)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        <div className="flex justify-between text-sm text-muted-foreground px-2 pt-4 border-t">
-          <p>Total Quantity: {totalStockQuantity}</p>
-          <p>Total Profit: ₹{totalStockProfit.toFixed(2)}</p>
-        </div>
-
-        <Pagination className="justify-end mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setStockPage((prev) => Math.max(prev - 1, 1));
-                }}
-              />
-            </PaginationItem>
-            <PaginationItem>
-              <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">
-                {stockPage} / {totalStockPages}
-              </span>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setStockPage((prev) => Math.min(prev + 1, totalStockPages));
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </Card>
-
-      {/* WORKERS */}
-      <Card className="p-4 md:p-6 space-y-6">
-        <h2 className="text-2xl font-bold">Workers Management</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <Input
-            placeholder="Name"
-            value={workerForm.name}
-            onChange={(e) => setWorkerForm({ ...workerForm, name: e.target.value })}
-          />
-          <Input
-            placeholder="Role"
-            value={workerForm.role}
-            onChange={(e) => setWorkerForm({ ...workerForm, role: e.target.value })}
-          />
-          <Input
-            placeholder="Farm"
-            value={workerForm.farm}
-            onChange={(e) => setWorkerForm({ ...workerForm, farm: e.target.value })}
-          />
-          <Button onClick={addWorker}>Add Worker</Button>
-        </div>
-
-        <Input
-          className="max-w-xs"
-          placeholder="Search Worker"
-          value={searchWorker}
-          onChange={(e) => setSearchWorker(e.target.value)}
-        />
-
-        <div className="overflow-x-auto -mx-4 px-4">
-          <div className="min-w-[600px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Farm</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginate(filteredWorkers, workerPage).map((worker) => (
-                  <TableRow key={worker.id}>
-                    <TableCell>{worker.name}</TableCell>
-                    <TableCell>{worker.role}</TableCell>
-                    <TableCell>{worker.farm}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={worker.cost}
-                        onChange={(e) => {
-                          const updated = workers.map((w) =>
-                            w.id === worker.id ? { ...w, cost: parseFloat(e.target.value) } : w
-                          );
-                          setWorkers(updated);
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button size="sm" onClick={() => updateWorker(worker.id, worker.cost)}>
-                        Update
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteWorker(worker.id)}>
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        <div className="flex justify-end text-sm text-muted-foreground px-2 pt-4 border-t">
-          <p>Total Worker Cost: ₹{totalWorkerCost.toFixed(2)}</p>
-        </div>
-
-        <Pagination className="justify-end mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setWorkerPage((prev) => Math.max(prev - 1, 1));
-                }}
-              />
-            </PaginationItem>
-            <PaginationItem>
-              <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">
-                {workerPage} / {totalWorkerPages}
-              </span>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setWorkerPage((prev) => Math.min(prev + 1, totalWorkerPages));
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </Card>
-    </div>
-  );
+    );
 }

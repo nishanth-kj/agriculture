@@ -1,9 +1,9 @@
-import { pgTable, text, timestamp, integer, bigint, index } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, bigint, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { user } from "./user";
 
 export const role = pgTable("role", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: text("name").notNull().unique(), // e.g., 'FARMER', 'ADMIN'
   status: integer("status").default(1).notNull(),
   createdBy: integer("created_by").references(() => user.id),

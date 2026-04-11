@@ -8,7 +8,6 @@ import {
     FaBars,
     FaTimes,
     FaHome,
-    FaEnvelope,
     FaInfoCircle,
     FaSun,
     FaMoon,

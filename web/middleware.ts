@@ -18,7 +18,7 @@ export function middleware(req: NextRequest) {
         try {
             verifyToken(token);
             return NextResponse.redirect(new URL('/dashboard', req.url));
-        } catch (e) {
+        } catch {
             // Token invalid, allow access to auth routes
         }
     }

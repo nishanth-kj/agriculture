@@ -1,6 +1,5 @@
 "use client";
 import React from 'react';
-import Link from 'next/link';
 import { FaLeaf, FaRobot, FaUsers } from 'react-icons/fa';
 
 export default function AboutSection() {

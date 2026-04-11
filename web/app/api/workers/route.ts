@@ -1,84 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/drizzle ';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken, ApiResponse, ErrorException } from '@/lib/server';
+import { AUTH, STATUS } from '@/lib';
+import { JwtPayload, ApiErrorCode, ApiErrorMessage, Pagination } from '@/types';
+import { NextRequest } from 'next/server';
+import { WorkerService } from '@/services/worker.service';
 
-interface JwtPayload {
-  id: string;
-  email: string;
-}
-
-// GET /api/workers - Fetch workers based on userId
-export async function GET(req: NextRequest) {
-  try {
-    const token = req.cookies.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Decode the token to get userId
-    const decoded = verifyToken(token) as unknown as JwtPayload;
-
-    // Check if the token contains userId
-    if (!decoded?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Fetch workers associated with the userId
-    const workers = await prisma.worker.findMany({
-      where: {
-        userId: decoded.id, // Query workers by userId
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    // Return the fetched workers
-    return NextResponse.json(workers);
-  } catch (error) {
-    console.error('❌ Error in GET /api/workers:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
-
-// POST /api/workers - Create a new worker entry
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
+    const token = req.cookies.get(AUTH.COOKIE.NAME)?.value;
+    if (!token) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const decoded = verifyToken(token) as JwtPayload;
+    if (!decoded?.id) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
+
+    // Authorization check (Optional: Only FARMER or ADMIN can manage workers)
+    // For now, any logged in user can access
+
+    const body = await req.json();
+
+    // 1. Pagination Logic
+    if (body.page !== undefined && body.size !== undefined) {
+      const pagination: Pagination = {
+        page: Number(body.page),
+        size: Number(body.size),
+        total: 0,
+        totalPages: 0
+      };
+      const workers = await WorkerService.listPaginated(pagination);
+      return ApiResponse(workers).success();
     }
 
-    // Decode the token to get userId
-    const decoded = verifyToken(token) as unknown as JwtPayload;
-
-    // Check if the token contains userId
-    if (!decoded?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // 2. Delete Logic
+    if (body.id && (body.status === 0 || body.status === STATUS.INACTIVE)) {
+      const id = typeof body.id === 'string' ? parseInt(body.id) : body.id;
+      const result = await WorkerService.delete(id);
+      return ApiResponse(result).success();
     }
 
-    const { name, role, farm, cost } = await req.json();
-    if (!name || !role || !farm || !cost) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
-
-    // Create a new worker entry
-    const worker = await prisma.worker.create({
-      data: {
-        name,
-        role,
-        farm,
-        userId: decoded.id,  // Associate the worker with the logged-in user
-        cost: parseFloat(cost),
-      },
+    // 3. Create Logic (Automated User Creation included in Service)
+    const result = await WorkerService.create({
+      name: body.name,
+      email: body.email,
+      username: body.username,
+      farm: body.farm,
+      role: body.role
     });
 
-    // Return the created worker
-    return NextResponse.json(worker);
+    return ApiResponse(result).success();
   } catch (error) {
-    console.error('❌ Error in POST /api/workers:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('Error in POST /api/workers:', error);
+    return ErrorException(
+      ApiErrorMessage.INTERNAL_SERVER_ERROR.value,
+      ApiErrorCode.INTERNAL_SERVER_ERROR.code
+    );
   }
 }
+

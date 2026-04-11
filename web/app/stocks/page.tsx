@@ -3,11 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Price from '@/components/Price/Price';
 import Map from '@/components/Map/Map';
 
-interface MarketData {
-  price: number;
-  trend: 'up' | 'down' | 'stable';
-  // Add other properties as needed based on Price/Map component props
-}
+import { MarketData } from '@/types';
 
 const Stocks = () => {
   const [marketData, setMarketData] = useState<MarketData | null>(null);
