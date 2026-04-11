@@ -88,11 +88,11 @@ export default function CropPredictionPage() {
 
       if (data.response) {
         setResult(data);
-        toast.success('✅ Prediction successful');
+        toast.success('  Prediction successful');
       } else {
         // Handle unexpected structure if necessary
         setResult(data);
-        toast.success('✅ Response received');
+        toast.success('  Response received');
       }
 
     } catch (err: any) {

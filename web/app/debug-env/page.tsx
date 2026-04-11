@@ -35,7 +35,7 @@ export default function EnvDebugPage() {
                     </div>
 
                     <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
-                        <h3 className="font-semibold mb-2">✅ If you see the correct URL:</h3>
+                        <h3 className="font-semibold mb-2">  If you see the correct URL:</h3>
                         <p className="text-sm">Your environment variable is configured correctly! API calls should now go to the production server.</p>
                     </div>
                 </div>

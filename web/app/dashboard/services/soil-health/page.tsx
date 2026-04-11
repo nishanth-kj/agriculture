@@ -74,7 +74,7 @@ export default function SoilHealthPage() {
           confidence: confidence.toString(),
         }));
 
-        toast.success('✅ Prediction successful!');
+        toast.success('  Prediction successful!');
         setIsExisting(true);
       } else {
         toast.error(result.message || '❌ Failed to get prediction');
