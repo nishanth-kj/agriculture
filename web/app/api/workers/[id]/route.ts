@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import prisma from '@/lib/drizzle ';
 
 // DELETE Worker by ID
 export async function DELETE(

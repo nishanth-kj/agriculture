@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import prisma from '@/lib/drizzle ';
 
 export async function GET(req: NextRequest) {
     try {
