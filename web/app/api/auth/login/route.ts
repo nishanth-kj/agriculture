@@ -1,59 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { comparePassword, generateToken } from '@/lib/auth';
+import { ApiResponse, ErrorException } from '@/lib/server';
+import { AUTH } from '@/lib';
+import { ApiErrorCode, ApiErrorMessage } from '@/types';
+import { NextRequest } from 'next/server';
+import { UserService } from '@/services/user.service';
 
 export async function POST(req: NextRequest) {
-    try {
-        const { email, password } = await req.json();
+  try {
+    const body = await req.json();
+    // Support identification via 'email' (legacy/frontend) or 'username' or 'identifier'
+    const identifier = body.email || body.username || body.identifier;
+    const { password } = body;
 
-        if (!email || !password) {
-            return NextResponse.json({ status: 0, message: "Email and password are required" }, { status: 400 });
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
-
-        if (!user) {
-            return NextResponse.json({ status: 0, message: "Invalid credentials" }, { status: 401 });
-        }
-
-        const isPasswordValid = await comparePassword(password, user.password);
-
-        if (!isPasswordValid) {
-            return NextResponse.json({ status: 0, message: "Invalid credentials" }, { status: 401 });
-        }
-
-        const token = generateToken({
-            id: user.id,
-            email: user.email,
-            role: user.role
-        });
-
-        const response = NextResponse.json({
-            status: 1,
-            message: "Login successful",
-            data: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role
-            }
-        });
-
-        // Set token in a httpOnly cookie
-        response.cookies.set('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 7, // 7 days
-            path: '/',
-        });
-
-        return response;
-
-    } catch (error: any) {
-        console.error("Login error:", error);
-        return NextResponse.json({ status: 0, message: "Internal server error" }, { status: 500 });
+    if (!identifier || !password) {
+      return ApiResponse(ApiErrorCode.MISSING_FIELDS).error();
     }
+
+    const { user, token } = await UserService.login(identifier, password);
+
+    const response = ApiResponse(user).success();
+
+    // Set secure auth cookie
+    response.cookies.set(AUTH.COOKIE.NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === AUTH.COOKIE.SECURE_ENV,
+      sameSite: AUTH.COOKIE.SAME_SITE as 'lax' | 'strict' | 'none',
+      maxAge: AUTH.COOKIE.MAX_AGE,
+      path: AUTH.COOKIE.PATH,
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Login error:', error);
+    return ErrorException(
+      ApiErrorMessage.AUTHENTICATION_ERROR.value,
+      ApiErrorCode.AUTHENTICATION_ERROR.code
+    );
+  }
 }
+

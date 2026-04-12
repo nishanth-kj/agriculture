@@ -1,8 +1,7 @@
-import Link from "next/link";
-import Hero from "@/components/Hero/Hero";
-import Mission from "@/components/Mission/Mission";
-import HowItWorks from "@/components/HowItWorks/HowItWorks";
-import Footer from "@/components/Footer/Footer";
+import Hero from "@/components/home/Hero/Hero";
+import Mission from "@/components/home/Mission/Mission";
+import HowItWorks from "@/components/home/HowItWorks/HowItWorks";
+import Footer from "@/components/home/Footer/Footer";
 
 function page() {
   return (

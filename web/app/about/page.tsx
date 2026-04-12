@@ -3,16 +3,10 @@
 import { useState, useEffect } from "react";
 import { FaGithub, FaBullseye, FaRocket } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 import Shivamurthy from "@/assets/Shivamurthy.png";
 import Guide from "@/assets/Akshatha M.png";
-interface GithubProfile {
-  name: string;
-  role: string;
-  avatarUrl: string;
-  bio: string;
-  publicRepos: number;
-  githubUrl: string;
-}
+import { GithubProfile } from "@/types";
 
 export default function AboutPage() {
   const [githubData, setGithubData] = useState<GithubProfile[]>([]);
@@ -48,7 +42,7 @@ export default function AboutPage() {
       const data = await Promise.all(
         teamMembers.map(async (member) => {
           const response = await fetch(
-            `https://api.github.com/users/${member.github.split("/").pop()}`
+            `https://api.github.com/users/${member.github.split("/").pop()}`,
           );
           const profileData = await response.json();
           return {
@@ -59,7 +53,7 @@ export default function AboutPage() {
             publicRepos: profileData.public_repos,
             githubUrl: member.github,
           };
-        })
+        }),
       );
       setGithubData(data);
       setLoading(false);
@@ -91,8 +85,8 @@ export default function AboutPage() {
             <p className="text-lg leading-relaxed mb-6">
               At AgriTech, we aim to empower farmers with the tools and
               knowledge they need to succeed in a rapidly changing world. By
-              combining traditional farming wisdom with modern technology, we are
-              building a sustainable future for agriculture.
+              combining traditional farming wisdom with modern technology, we
+              are building a sustainable future for agriculture.
             </p>
           </div>
 
@@ -138,8 +132,8 @@ export default function AboutPage() {
                   Dr.Shivamurthy R.C
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Dr.Shivamurthy R.C is our esteemed team guide and a researcher&apos;s
-                  mentor.
+                  Dr.Shivamurthy R.C is our esteemed team guide and a
+                  researcher&apos;s mentor.
                 </p>
               </div>
               <div className="bg-white p-6 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
@@ -154,8 +148,8 @@ export default function AboutPage() {
                   Akshatha M
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Prof. Akshatha M is our esteemed team co guide and a researcher&apos;s
-                  mentor.
+                  Prof. Akshatha M is our esteemed team co guide and a
+                  researcher&apos;s mentor.
                 </p>
               </div>
 
@@ -180,13 +174,13 @@ export default function AboutPage() {
                     Public Repos: {member.publicRepos}
                   </p>
                   <div className="mt-4 flex justify-center items-center space-x-2">
-                    <a
+                    <Link
                       href={member.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       <FaGithub className="text-gray-800 hover:text-blue-600 text-2xl" />
-                    </a>
+                    </Link>
                     <span className="text-gray-800 text-lg">GitHub</span>
                   </div>
                 </div>
@@ -201,10 +195,10 @@ export default function AboutPage() {
             Join Us on Our Journey
           </h3>
           <p className="text-gray-600">
-            We believe in collaboration and innovation. If you&apos;re passionate
-            about transforming agriculture with technology, we would love to
-            have you on our team. Get in touch to learn more about how you can
-            be a part of our mission.
+            We believe in collaboration and innovation. If you&apos;re
+            passionate about transforming agriculture with technology, we would
+            love to have you on our team. Get in touch to learn more about how
+            you can be a part of our mission.
           </p>
         </div>
       </div>

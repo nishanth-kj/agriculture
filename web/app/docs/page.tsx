@@ -3,18 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { FaPython, FaGithub, FaCode, FaTerminal, FaCodeBranch, FaInfoCircle } from 'react-icons/fa';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 
 export default function DocsPage() {
     return (
         <div className="flex flex-col lg:flex-row min-h-screen container mx-auto px-4 lg:px-6 py-12 gap-10 dark:bg-background">
-            {/* Sidebar Navigation */}
             {/* Sidebar Navigation */}
             <aside className="w-full lg:w-64 flex-shrink-0 hidden lg:block">
                 <div className="sticky top-24 space-y-8">
@@ -189,7 +181,7 @@ file: <image_file>`}
                     </h2>
                     <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-8 rounded-xl border border-green-200 dark:border-green-800">
                         <p className="text-gray-700 dark:text-gray-300 mb-6 text-lg">
-                            We welcome contributions from the community! Whether it's fixing bugs, improving documentation, or proposing new features, your help is appreciated.
+                            We welcome contributions from the community! Whether it&apos;s fixing bugs, improving documentation, or proposing new features, your help is appreciated.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link href="/contribution" className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-md">

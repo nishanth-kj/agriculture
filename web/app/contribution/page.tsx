@@ -8,7 +8,7 @@ export default function ContributionPage() {
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold text-green-800 dark:text-green-500 mb-4">Contribute to AgriTech</h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                    We welcome contributions from the community! Whether you're fixing bugs, improving documentation, or adding new features, we appreciate your help in making agriculture technology more accessible.
+                    We welcome contributions from the community! Whether you&apos;re fixing bugs, improving documentation, or adding new features, we appreciate your help in making agriculture technology more accessible.
                 </p>
             </div>
 
@@ -56,7 +56,7 @@ export default function ContributionPage() {
                         <span className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-3 py-1 rounded-full text-sm font-bold mr-4 shrink-0">1</span>
                         <div>
                             <p className="font-semibold mb-1">Fork the Repository</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Click the "Fork" button on the GitHub repository to create your own copy.</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Click the &quot;Fork&quot; button on the GitHub repository to create your own copy.</p>
                         </div>
                     </div>
                     <div className="flex items-start">

@@ -25,7 +25,7 @@ export default function EnvDebugPage() {
                     </div>
 
                     <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg">
-                        <h3 className="font-semibold mb-2">⚠️ If you see "NOT SET":</h3>
+                        <h3 className="font-semibold mb-2">⚠️ If you see &quot;NOT SET&quot;:</h3>
                         <ol className="list-decimal list-inside space-y-1 text-sm">
                             <li>Add <code className="bg-yellow-100 dark:bg-yellow-900 px-1">NEXT_PUBLIC_API_URL=https://agriculture-j9bi.onrender.com/api</code> to your .env file</li>
                             <li>Stop the dev server (Ctrl+C)</li>

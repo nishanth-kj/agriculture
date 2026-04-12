@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,7 +10,6 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 
 export default function SignUpPage() {
-  const router = useRouter()
   const { register } = useAuth()
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [loading, setLoading] = useState(false)
@@ -31,8 +29,9 @@ export default function SignUpPage() {
       await register(form)
       toast.success('Account created and logged in!')
       // redirect is handled in register() in AuthContext
-    } catch (err: any) {
-      toast.error(err.message || 'Registration failed')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      toast.error(message)
     } finally {
       setLoading(false)
     }

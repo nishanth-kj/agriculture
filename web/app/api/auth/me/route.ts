@@ -1,51 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { verifyToken, ApiResponse, ErrorException } from '@/lib/server';
+import { AUTH } from '@/lib';
+import { ApiErrorCode, ApiErrorMessage, JwtPayload } from '@/types';
+import { NextRequest } from 'next/server';
+import { UserService } from '@/services/user.service';
 
-export async function GET(req: NextRequest) {
-    try {
-        const token = req.cookies.get('token')?.value;
+export async function POST(req: NextRequest) {
+  try {
+    const token = req.cookies.get(AUTH.COOKIE.NAME)?.value;
 
-        if (!token) {
-            return NextResponse.json({ status: 0, message: "Not authenticated" }, { status: 401 });
-        }
-
-        const decoded: any = verifyToken(token);
-
-        const user = await prisma.user.findUnique({
-            where: { id: decoded.id },
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-            }
-        });
-
-        if (!user) {
-            return NextResponse.json({ status: 0, message: "User not found" }, { status: 404 });
-        }
-
-        return NextResponse.json({
-            status: 1,
-            data: user
-        });
-
-    } catch (error) {
-        return NextResponse.json({ status: 0, message: "Invalid session" }, { status: 401 });
+    if (!token) {
+      return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
     }
+
+    const decoded = verifyToken(token) as JwtPayload;
+    const userId = typeof decoded.id === 'string' ? parseInt(decoded.id) : decoded.id;
+
+    if (!userId) {
+      return ApiResponse(ApiErrorCode.AUTHENTICATION_ERROR).error();
+    }
+
+    const user = await UserService.getProfile(userId);
+
+    return ApiResponse(user).success();
+  } catch (error) {
+    console.error('Session error:', error);
+    return ErrorException(
+      ApiErrorMessage.AUTHENTICATION_ERROR.value,
+      ApiErrorCode.AUTHENTICATION_ERROR.code
+    );
+  }
 }
 
-export async function DELETE() {
-    const response = NextResponse.json({
-        status: 1,
-        message: "Logged out successfully"
-    });
-
-    response.cookies.set('token', '', {
-        maxAge: 0,
-        path: '/',
-    });
-
-    return response;
-}
