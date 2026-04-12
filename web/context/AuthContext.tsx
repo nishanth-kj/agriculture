@@ -16,9 +16,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const data = await api('api/auth/me').post();
-                if (data) {
-                    setUser(data as User);
+                const res = await api('api/auth/me').post();
+                if (res?.data) {
+                    setUser(res.data as User);
                 }
             } catch {
                 setUser(null);
@@ -31,11 +31,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (credentials: unknown) => {
         try {
-            const data = await api('api/auth/login', credentials).post();
-            if (data) {
-                const user = data as User;
-                setUser(user);
-                const rolePath = String(user.role || 'dashboard').toLowerCase();
+            const res = await api('api/auth/login', credentials).post();
+            if (res?.data) {
+                const userObj = res.data as User;
+                setUser(userObj);
+                const rolePath = String(userObj.role || 'dashboard').toLowerCase();
                 router.push(`/dashboard/${rolePath}`);
             }
         } catch (err: unknown) {
@@ -45,11 +45,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const register = async (data: unknown) => {
         try {
-            const resData = await api('/api/auth/register', data).post();
-            if (resData) {
-                const user = resData as User;
-                setUser(user);
-                const rolePath = String(user.role || 'dashboard').toLowerCase();
+            const res = await api('/api/auth/register', data).post();
+            if (res?.data) {
+                const userObj = res.data as User;
+                setUser(userObj);
+                const rolePath = String(userObj.role || 'dashboard').toLowerCase();
                 router.push(`/dashboard/${rolePath}`);
             }
         } catch (err: unknown) {

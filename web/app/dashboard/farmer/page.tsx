@@ -65,8 +65,10 @@ export default function FarmerDashboardPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const data = await api("api/farmer/dashboard").post();
-      setStats(data as FarmerDashboardProps["stats"]);
+      const res = await api("/api/farmer/dashboard").post();
+      if (res?.data) {
+        setStats(res.data as FarmerDashboardProps["stats"]);
+      }
     } catch (err) {
       console.error("Farmer stats error:", err);
       setStats({
