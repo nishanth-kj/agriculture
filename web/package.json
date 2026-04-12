@@ -12,7 +12,7 @@
     "migrate": "drizzle-kit migrate",
     "seed": "tsx drizzle/seed/seed.ts",
     "studio": "drizzle-kit studio",
-    "postinstall": "drizzle-kit generate && drizzle-kit migrate && drizzle-kit seed"
+    "postinstall": "drizzle-kit generate && drizzle-kit migrate && npm run seed"
   },
   "dependencies": {
     "@emotion/cache": "^11.13.1",
