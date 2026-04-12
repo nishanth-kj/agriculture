@@ -24,7 +24,6 @@ import {
   X,
   Eye,
   EyeOff,
-  Settings,
 } from "lucide-react";
 import {
   Select,

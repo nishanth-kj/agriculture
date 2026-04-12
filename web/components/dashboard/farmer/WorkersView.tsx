@@ -86,7 +86,7 @@ export default function WorkersView() {
         return;
       }
 
-      const mapped = resp.data.items.map((item: any) => ({
+      const mapped = resp.data.items.map((item: WorkerApiItem) => ({
         id: String(item.id),
         name: item.user?.name || "Worker",
         farm: item.farm || "General",
@@ -98,16 +98,19 @@ export default function WorkersView() {
       if (resp.data.pagination) {
         setPagination(prev => prev.clone().updateFromResponse(resp.data.pagination!));
       }
-    } catch (e: any) {
-      toast.error(e.message || "Failed to fetch workforce");
+    } catch (e: unknown) {
+      toast.error((e as Error).message || "Failed to fetch workforce");
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.size]);
+  }, [pagination.page,
+  pagination.size,
+  pagination.sortBy,
+  pagination.sortOrder]);
 
   useEffect(() => {
     fetchWorkers();
-  }, [refreshKey]);
+  }, [fetchWorkers,refreshKey]);
 
   const handlePaginationChange = (page: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc') => {
     void fetchWorkers(page, size, sortOrder, sortBy);
@@ -138,8 +141,8 @@ export default function WorkersView() {
       setRefreshKey(prev => prev + 1);
       setIsAddDialogOpen(false);
       resetForm();
-    } catch (e: any) {
-      toast.error(e.message || "Deployment failed");
+    } catch (e: unknown) {
+      toast.error((e as Error).message || "Deployment failed");
     } finally {
       setIsSaving(false);
     }
@@ -165,8 +168,8 @@ export default function WorkersView() {
 
       toast.success("Worker deactivated");
       setRefreshKey(prev => prev + 1);
-    } catch (e: any) {
-      toast.error(e.message || "Deactivation failed");
+    } catch (e: unknown) {
+      toast.error((e as Error).message || "Deactivation failed");
     }
   };
 
@@ -383,7 +386,7 @@ export default function WorkersView() {
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke Authorization?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will immediately deactivate the operative's access to farm terminals. History will be preserved.
+              This will immediately deactivate the operative`&apos;`s access to farm terminals. History will be preserved.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

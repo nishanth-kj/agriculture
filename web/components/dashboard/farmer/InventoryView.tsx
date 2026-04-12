@@ -44,9 +44,10 @@ import {
 import { DataTable, Column } from "@/components/common/DataTable/DataTable";
 import {
   ApiResponsePayload,
-  InventoryApiItem,
   InventoryItem,
-  InventoryFormData
+  InventoryFormData,
+  InventoryApiItem,
+  Pagination
 } from "@/types";
 import { StatusBadge } from "@/components/common/StatusBadge/StatusBadge";
 import { api, STATUS } from "@/lib";
@@ -79,14 +80,14 @@ export default function InventoryView() {
         size: size ?? pagination.size,
         sortOrder: sortOrder ?? pagination.sortOrder,
         sortBy: sortBy ?? pagination.sortBy,
-      }).post() as ApiResponsePayload<{ items: any[], pagination: any }>;
+      }).post() as ApiResponsePayload<{ items: InventoryApiItem[], pagination: Pagination }>;
 
       if (!resp.data?.items) {
         setData([]);
         return;
       }
 
-      const mapped: InventoryItem[] = resp.data.items.map((item: any) => ({
+      const mapped: InventoryItem[] = resp.data.items.map((item: InventoryApiItem) => ({
         id: String(item.id),
         name: item.name,
         category: item.location || "General",
@@ -105,11 +106,14 @@ export default function InventoryView() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.size]);
+  }, [pagination.page,
+  pagination.size,
+  pagination.sortBy,
+  pagination.sortOrder]);
 
   useEffect(() => {
     fetchData();
-  }, [refreshKey]); // Remove fetchData from deps to avoid loop weight
+  }, [fetchData,refreshKey]); // Remove fetchData from deps to avoid loop weight
 
   const handlePaginationChange = (page: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc') => {
     void fetchData(page, size, sortOrder, sortBy);

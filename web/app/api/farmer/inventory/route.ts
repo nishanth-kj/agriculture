@@ -1,5 +1,5 @@
 import { verifyToken, ApiResponse, ErrorException } from '@/lib/server';
-import { AUTH, STATUS } from '@/lib';
+import { AUTH } from '@/lib';
 import { JwtPayload, ApiErrorCode, ApiErrorMessage } from '@/types';
 import { NextRequest } from 'next/server';
 import { StockService } from '@/services/stock.service';

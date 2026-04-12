@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { isValidIdentity } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'

@@ -4,9 +4,8 @@
  * All methods call POST under the hood to satisfy the project's POST-only architecture.
  */
 export const api = (url: string, payload: unknown = {}) => {
-  const request = async (method: string) => {
+  const request = async () => {
     const options: RequestInit = {
-      method: 'POST', // Enforced architecture
       headers: {
         'Content-Type': 'application/json',
       },
@@ -45,9 +44,9 @@ export const api = (url: string, payload: unknown = {}) => {
   };
 
   return {
-    get: () => request('GET'),
-    post: () => request('POST'),
-    put: () => request('PUT'),
-    delete: () => request('DELETE'),
+    get: () => request(),
+    post: () => request(),
+    put: () => request(),
+    delete: () => request(),
   };
 };
