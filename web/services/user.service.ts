@@ -108,6 +108,7 @@ export class UserService {
         const token = generateToken({
             id: foundUser.id as number,
             email: foundUser.email as string,
+            role: foundUser.role as string,
         });
 
         return {
@@ -143,7 +144,7 @@ export class UserService {
                 status: STATUS.ACTIVE.code
             }).returning();
 
-            const targetRoleName = userData.roleName || ROLE.FARMER.value;
+            const targetRoleName = (userData.roleName || ROLE.FARMER.value).toUpperCase();
             const [roleRecord] = await tx.select().from(role).where(eq(role.name, targetRoleName)).limit(1);
 
             if (roleRecord) {
@@ -157,6 +158,7 @@ export class UserService {
             const token = generateToken({
                 id: newUser.id,
                 email: newUser.email,
+                role: targetRoleName,
             });
 
             return {

@@ -18,9 +18,10 @@ async function main() {
   for (const r of rolesToSeed) {
     await db.insert(dbSchema.role).values(r).onConflictDoNothing();
   }
-  
+
   const allRoles = await db.select().from(dbSchema.role);
   const adminRole = allRoles.find(r => r.name === 'ADMIN')!;
+  const ADMIN_ROLE_NAME = 'ADMIN';
 
   // 2. Seed Admin User
   console.log('👤 Seeding admin user...');
@@ -42,18 +43,20 @@ async function main() {
     }
   }).returning();
 
-  // 3. Assign Admin Role
+  // 3. Assign Admin Role explicitly to the seeded admin user
   await db.insert(dbSchema.userRole).values({
     userId: adminUser.id,
     roleId: adminRole.id,
     status: 1
   }).onConflictDoNothing();
 
+  console.log(`✅ Seeded admin user with role: ${ADMIN_ROLE_NAME}`);
+
   console.log('✅ User seeded & role assigned:', adminUser.email);
 
   // 4. Seed Stocks
   await db.delete(dbSchema.stock).where(eq(dbSchema.stock.userId, adminUser.id));
-  
+
   await db.insert(dbSchema.stock).values([
     { name: 'Body', quantity: 233, location: 'New Donald', cost: '19.5', sellingPrice: '29.5', userId: adminUser.id, status: 1 },
     { name: 'Rock', quantity: 249, location: 'North Michellechester', cost: '25.3', sellingPrice: '35.3', userId: adminUser.id, status: 1 },

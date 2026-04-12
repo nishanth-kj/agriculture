@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import NavBar from "@/components/NavBar/NavBar";
-import ChatBotWidget from '@/components/ChatBotWidget/ChatBotWidget';
+import NavBar from "@/components/home/NavBar/NavBar";
+import ChatBotWidget from "@/components/common/ChatBotWidget/ChatBotWidget";
 import { Providers } from "@/components/Providers";
 
 const geistSans = localFont({
@@ -30,13 +30,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Providers>
           <Toaster position="top-right" />
           <NavBar />
-          <div className="pt-16">
-            {children}
-          </div>
+          <div className="pt-16">{children}</div>
           <ChatBotWidget />
         </Providers>
       </body>

@@ -16,7 +16,8 @@ export const api = (url: string, payload: unknown = {}) => {
       }),
     };
 
-    const response = await fetch(url, options);
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+    const response = await fetch(normalizedUrl, options);
 
     // Auto-handle 401 Unauthorized
     if (response.status === 401) {
@@ -24,6 +25,15 @@ export const api = (url: string, payload: unknown = {}) => {
           window.location.href = '/login';
       }
       return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("API did not return a valid JSON response");
     }
 
     const result = await response.json();

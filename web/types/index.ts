@@ -17,22 +17,20 @@ export * from "@/types/data/season.type";
 export * from "@/types/data/state.type";
 export * from "@/types/data/weather-data.type";
 
-// Model (Database Table Entities)
-export * from "@/types/model/crop-prediction.type";
-export * from "@/types/model/crop.type";
-export * from "@/types/model/new-crop-prediction.type";
-export * from "@/types/model/new-role-model.type";
-export * from "@/types/model/new-soil.type";
-export * from "@/types/model/new-stock.type";
-export * from "@/types/model/new-user-role.type";
-export * from "@/types/model/new-user.type";
-export * from "@/types/model/role-model.type";
-export * from "@/types/model/role-type.type";
-export * from "@/types/model/soil.type";
-export * from "@/types/model/stock.type";
-export * from "@/types/model/user-role.type";
-export * from "@/types/model/user.type";
-export * from "@/types/model/worker.type";
+// Model (Database Table Entities - Interfaces)
+export * from "@/types/interfaces/crop-prediction";
+export * from "@/types/interfaces/crop";
+export * from "@/types/interfaces/new-soil";
+export * from "@/types/interfaces/new-stock";
+export * from "@/types/interfaces/new-user-role";
+export * from "@/types/interfaces/new-user";
+export * from "@/types/interfaces/role-model";
+export * from "@/types/interfaces/role-type";
+export * from "@/types/interfaces/soil";
+export * from "@/types/interfaces/stock";
+export * from "@/types/interfaces/user-role";
+export * from "@/types/interfaces/user";
+export * from "@/types/interfaces/worker";
 
 // Request (API Request Payloads)
 export * from "@/types/request/chat-request.type";
@@ -59,9 +57,17 @@ export * from "@/types/result/chatbot-user.type";
 
 // Props (Component communication)
 export * from "@/types/props/dashboard/role-stat.type";
+export * from "@/types/props/dashboard/dashboard-layout-props.type";
 export * from "@/types/props/dashboard/admin-dashboard-props.type";
 export * from "@/types/props/dashboard/farmer-dashboard-props.type";
 export * from "@/types/props/dashboard/worker-dashboard-props.type";
+export * from "@/types/props/dashboard/sidebar-props.type";
+export * from "@/types/props/dashboard/sidebar-base-props.type";
+export * from "./props/dashboard/sidebar-item-props.type";
+export * from "./props/dashboard/soil-health-props.type";
+export * from "./props/dashboard/crop-prediction-props.type";
+export * from "./props/dashboard/pest-prediction-props.type";
+export * from "@/types/props/dashboard/managing-page-props.type";
 export * from "@/types/props/price.type";
 
 // Constants (Exposed via types for convenience)
