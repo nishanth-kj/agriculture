@@ -41,7 +41,7 @@ export default function LoginPage() {
 
     setLoading(true)
     try {
-      await login({ ...form, isWorker });
+      await login({ ...form });
       toast.success('Login successful')
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid credentials';
