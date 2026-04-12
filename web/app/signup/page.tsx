@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -30,7 +30,8 @@ export default function SignUpPage() {
       toast.success('Account created and logged in!')
       // redirect is handled in register() in AuthContext
     } catch (err: unknown) {
-      toast.error((err as Error).message || 'Registration failed')
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      toast.error(message)
     } finally {
       setLoading(false)
     }

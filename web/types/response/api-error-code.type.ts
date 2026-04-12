@@ -14,7 +14,8 @@ export const ApiErrorCode: EnumDefinition<
     "INVALID_CREDENTIALS" |
     "EMAIL_IN_USE" |
     "MISSING_FIELDS" |
-    "UNAUTHORIZED"
+    "UNAUTHORIZED" |
+    "USERNAME_IN_USE"
 > = {
     VALIDATION_ERROR: new EnumItem(400, "The provided data is invalid."),
     AUTHENTICATION_ERROR: new EnumItem(401, "Authentication is required to access this resource."),
@@ -25,7 +26,8 @@ export const ApiErrorCode: EnumDefinition<
     INVALID_CREDENTIALS: new EnumItem(401, "Invalid email or password."),
     EMAIL_IN_USE: new EnumItem(400, "This email is already registered."),
     MISSING_FIELDS: new EnumItem(400, "Please fill in all required fields."),
-    UNAUTHORIZED: new EnumItem(401, "Unauthorized access.")
+    UNAUTHORIZED: new EnumItem(401, "Unauthorized access."),
+    USERNAME_IN_USE: new EnumItem(400, "This username is already taken."),
 };
 
 /**

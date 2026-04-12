@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const data = await api('/api/auth/me').post();
+                const data = await api('api/auth/me').post();
                 if (data) {
                     setUser(data as User);
                 }
@@ -31,10 +31,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (credentials: unknown) => {
         try {
-            const data = await api('/api/auth/login', credentials).post();
+            const data = await api('api/auth/login', credentials).post();
             if (data) {
-                setUser(data as User);
-                router.push('/dashboard');
+                const user = data as User;
+                setUser(user);
+                const rolePath = String(user.role || 'dashboard').toLowerCase();
+                router.push(`/dashboard/${rolePath}`);
             }
         } catch (err: unknown) {
             throw new Error((err as Error).message || 'Login failed');
@@ -45,8 +47,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const resData = await api('/api/auth/register', data).post();
             if (resData) {
-                setUser(resData as User);
-                router.push('/dashboard');
+                const user = resData as User;
+                setUser(user);
+                const rolePath = String(user.role || 'dashboard').toLowerCase();
+                router.push(`/dashboard/${rolePath}`);
             }
         } catch (err: unknown) {
             throw new Error((err as Error).message || 'Registration failed');

@@ -1,7 +1,7 @@
 import { ValidationException, NotFoundException } from '@/lib/server';
 import { STATUS } from '@/lib';
-import { NewStock, Stock, ApiErrorCode, Pagination } from '@/types';
-import { eq, asc, desc, SQL } from "drizzle-orm";
+import { NewStock, Stock, ApiErrorCode } from '@/types';
+import { eq, asc, desc, sql } from "drizzle-orm";
 import db from '@/lib/drizzle';
 import { stock } from "@/drizzle/schema";
 
@@ -16,20 +16,39 @@ export class StockService {
   /**
    * Get paginated and sorted stock items for a user
    */
-  static async listPaginated(userId: number, pagination: Pagination): Promise<Stock[]> {
-    let query = db.select().from(stock).where(eq(stock.userId, userId)).$dynamic();
+  static async listPaginated(userId: number, pagination: { pageNumber: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc' }) {
+    let query = db.select().from(stock).where(eq(stock.userId, userId));
+
+    // Get total count
+    const [countResult] = await db.select({ count: sql<number>`count(*)` })
+      .from(stock)
+      .where(eq(stock.userId, userId));
+
+    const total = Number(countResult.count);
+    const totalPages = Math.ceil(total / pagination.size);
 
     // Handle dynamic sorting
-    if (pagination.sortBy && (stock as unknown as Record<string, unknown>)[pagination.sortBy]) {
-      const orderFn = pagination.sortOrder === 'desc' ? desc : asc;
-      const column = (stock as unknown as Record<string, SQL.Aliased<unknown>>)[pagination.sortBy];
-      query = query.orderBy(orderFn(column));
+    if (pagination.sortBy && (stock as any)[pagination.sortBy]) {
+      const orderFn = pagination.sortOrder === 'asc' ? asc : desc;
+      query = (query as any).orderBy(orderFn((stock as any)[pagination.sortBy]));
     } else {
-      // Default sort by createdAt desc
-      query = query.orderBy(desc(stock.createdAt));
+      query = (query as any).orderBy(desc(stock.createdAt));
     }
 
-    return await query.limit(pagination.size).offset((pagination.page - 1) * pagination.size);
+    const results = await (query as any)
+      .limit(pagination.size)
+      .offset((pagination.pageNumber - 1) * pagination.size)
+      .$dynamic();
+
+    return {
+      items: results,
+      pagination: {
+        page: pagination.pageNumber,
+        size: pagination.size,
+        total,
+        totalPages
+      }
+    };
   }
 
   /**

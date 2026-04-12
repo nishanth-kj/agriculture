@@ -1,7 +1,7 @@
 import { ValidationException, NotFoundException } from '@/lib/server';
 import { ROLE, STATUS } from '@/lib';
-import { ApiErrorCode, Pagination } from '@/types';
-import { eq, desc } from "drizzle-orm";
+import { ApiErrorCode } from '@/types';
+import { eq, desc, sql, asc } from "drizzle-orm";
 import db from '@/lib/drizzle';
 import { user, worker } from "@/drizzle/schema";
 import { UserService } from "./user.service";
@@ -12,24 +12,27 @@ export class WorkerService {
    */
   static async create(data: {
     name: string,
-    email: string,
+    email?: string,
     username?: string,
+    password?: string,
     farm?: string,
-    role?: string
+    role?: string,
+    recruiterId?: number
   }) {
-    const { name, email, username, farm, role } = data;
+    const { name, email, username, password, farm, role, recruiterId } = data;
 
-    if (!name || !email) {
+    if (!name || !username) {
       throw new ValidationException(ApiErrorCode.MISSING_FIELDS);
     }
 
     // 1. Create the User account with WORKER role
     // Default password as requested: Welcome@123
     const { user: newUser } = await UserService.register({
-      email,
+      email: email || '',
       name,
       username,
-      password: 'Welcome@123',
+      password: password || 'Welcome@123',
+      parentUserId: recruiterId,
       roleName: ROLE.WORKER.value
     });
 
@@ -50,7 +53,7 @@ export class WorkerService {
   /**
    * List paginated workers with user details (using join)
    */
-  static async listPaginated(pagination: Pagination) {
+  static async listPaginated(pagination: { pageNumber: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc' }) {
     const query = db.select({
       id: worker.id,
       farm: worker.farm,
@@ -65,15 +68,33 @@ export class WorkerService {
     })
       .from(worker)
       .innerJoin(user, eq(worker.userId, user.id))
-      .where(eq(worker.status, STATUS.ACTIVE.code))
+      .where(eq(worker.status, STATUS.ACTIVE.code));
+
+    // Get total count for pagination
+    const [countResult] = await db.select({ count: sql<number>`count(*)` })
+      .from(worker)
+      .where(eq(worker.status, STATUS.ACTIVE.code));
+
+    const total = Number(countResult.count);
+    const totalPages = Math.ceil(total / pagination.size);
+
+    // Dynamic sorting
+    const sortField = pagination.sortBy === 'name' ? user.name : (pagination.sortBy === 'farm' ? worker.farm : worker.createdAt);
+
+    const results = await (query as any).orderBy(pagination.sortOrder === 'asc' ? sortField : desc(sortField))
+      .limit(pagination.size)
+      .offset((pagination.pageNumber - 1) * pagination.size)
       .$dynamic();
 
-    // Default sorting by createdAt desc
-    const results = await query.orderBy(desc(worker.createdAt))
-      .limit(pagination.size)
-      .offset((pagination.page - 1) * pagination.size);
-
-    return results;
+    return {
+      data: results,
+      pagination: {
+        page: pagination.pageNumber,
+        size: pagination.size,
+        total,
+        totalPages
+      }
+    };
   }
 
   /**
@@ -97,5 +118,3 @@ export class WorkerService {
     });
   }
 }
-
-

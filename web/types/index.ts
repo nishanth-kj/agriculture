@@ -11,11 +11,13 @@ export * from "@/types/context/auth-context.type";
 
 // Data (Page/Domain models)
 export * from "@/types/data/github-profile.type";
+export * from "@/types/data/inventory.type";
 export * from "@/types/data/market-data.type";
 export * from "@/types/data/market-price-entry.type";
 export * from "@/types/data/season.type";
 export * from "@/types/data/state.type";
 export * from "@/types/data/weather-data.type";
+export * from "@/types/data/worker.type";
 
 // Model (Database Table Entities - Interfaces)
 export * from "@/types/interfaces/crop-prediction";
@@ -31,14 +33,14 @@ export * from "@/types/interfaces/stock";
 export * from "@/types/interfaces/user-role";
 export * from "@/types/interfaces/user";
 export * from "@/types/interfaces/worker";
-export * from "@/types/interfaces/resource";
-export * from "@/types/interfaces/resource-form-data";
 
 // Request (API Request Payloads)
 export * from "@/types/request/chat-request.type";
+export * from "@/types/request/inventory-form.type";
 export * from "@/types/request/pest-form-data.type";
 export * from "@/types/request/pest-prediction-request.type";
 export * from "@/types/request/soil-health-input.type";
+export * from "@/types/request/worker-form.type";
 
 // Response (API Response Payloads)
 export * from "@/types/response/action-response.type";
@@ -70,12 +72,9 @@ export * from "@/types/props/dashboard/sidebar-base-props.type";
 export * from "./props/dashboard/sidebar-item-props.type";
 export * from "./props/dashboard/soil-health-props.type";
 export * from "./props/dashboard/crop-prediction-props.type";
-export * from "./props/dashboard/pest-prediction-props.type";
-export * from "@/types/props/dashboard/managing-page-props.type";
-export * from "@/types/props/resource-management-props.type";
+export * from "@/types/props/dashboard/pest-prediction-props.type";
 export * from "@/types/props/price.type";
 
 // Constants (Exposed via types for convenience)
 export { ROLE } from "@/lib/constants/role";
-export { RESOURCE_TYPE } from "@/lib/constants/resource-type";
 export { STATUS } from "@/lib/constants/status";

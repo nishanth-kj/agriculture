@@ -21,6 +21,8 @@ async function main() {
 
   const allRoles = await db.select().from(dbSchema.role);
   const adminRole = allRoles.find(r => r.name === 'ADMIN')!;
+  const farmerRole = allRoles.find(r => r.name === 'FARMER')!;
+  const workerRole = allRoles.find(r => r.name === 'WORKER')!;
   const ADMIN_ROLE_NAME = 'ADMIN';
 
   // 2. Seed Admin User
@@ -90,6 +92,41 @@ async function main() {
   ]);
 
   console.log('✅ Soil data seeded!');
+
+  // 6. Seed Workers
+  console.log('👷 Seeding workers...');
+  const workerPassword = await bcrypt.hash('Worker123', 10);
+  
+  const workerUsers = [
+    { name: 'John Doe', email: 'john@example.com', username: 'johndoe' },
+    { name: 'Jane Smith', email: 'jane@example.com', username: 'janesmith' },
+  ];
+
+  for (const wu of workerUsers) {
+    const [u] = await db.insert(dbSchema.user).values({
+      ...wu,
+      password: workerPassword,
+      status: 1,
+    }).onConflictDoNothing().returning();
+
+    if (u) {
+      await db.insert(dbSchema.userRole).values({
+        userId: u.id,
+        roleId: workerRole.id,
+        status: 1
+      }).onConflictDoNothing();
+
+      await db.insert(dbSchema.worker).values({
+        userId: u.id,
+        farm: 'Emerald Valley',
+        role: 'Field Technician',
+        status: 1,
+        createdBy: adminUser.id
+      }).onConflictDoNothing();
+    }
+  }
+
+  console.log('✅ Workers seeded!');
   console.log('✨ Seeding complete!');
   process.exit(0);
 }

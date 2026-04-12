@@ -1,6 +1,6 @@
 import { verifyToken, ApiResponse, ErrorException } from '@/lib/server';
 import { AUTH, STATUS } from '@/lib';
-import { JwtPayload, ApiErrorCode, ApiErrorMessage, Pagination } from '@/types';
+import { JwtPayload, ApiErrorCode, ApiErrorMessage } from '@/types';
 import { NextRequest } from 'next/server';
 import { StockService } from '@/services/stock.service';
 
@@ -12,73 +12,41 @@ export async function POST(req: NextRequest) {
     const decoded = verifyToken(token) as JwtPayload;
     if (!decoded?.id) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
 
-    const userId = typeof decoded.id === 'string' ? parseInt(decoded.id) : decoded.id;
-
     const body = await req.json();
 
-    // 1. Pagination Logic (Detected by presence of page and size)
-    if (body.page !== undefined && body.size !== undefined) {
-      const pagination: Pagination = {
-        page: Number(body.page),
+    // 1. Pagination Logic (Standardized Parameters)
+    if (body.pageNumber !== undefined && body.size !== undefined) {
+      const results = await StockService.listPaginated(decoded.id, {
+        pageNumber: Number(body.pageNumber),
         size: Number(body.size),
-        total: 0,
-        totalPages: 0
-      };
-      const stocks = await StockService.listPaginated(userId, pagination);
-      return ApiResponse(stocks).success();
-    }
-
-    // 2. Unified Upsert/Delete Logic (Detected by presence of id)
-    if (body.id) {
-      const id = typeof body.id === 'string' ? parseInt(body.id) : body.id;
-
-      // Soft Delete if status is 0
-      if (body.status === 0 || body.status === STATUS.INACTIVE.code) {
-        const deleted = await StockService.delete(id);
-        return ApiResponse(deleted).success();
-      }
-
-      // Update existing record
-      const updated = await StockService.update(id, {
-        ...body,
-        userId: userId
+        sortBy: body.sortBy,
+        sortOrder: body.sortOrder
       });
-      return ApiResponse(updated).success();
+      return ApiResponse(results).success();
     }
 
-    // 3. Create new record if no ID or Pagination params are provided
-    const stock = await StockService.create({
-      ...body,
-      userId: userId
+    // 2. Delete Logic
+    if (body.id) {
+      const result = await StockService.delete(Number(body.id));
+      return ApiResponse(result).success();
+    }
+
+    // 3. Create Logic
+    const result = await StockService.create({
+      name: body.name,
+      quantity: body.quantity,
+      location: body.location,
+      cost: body.cost || 0,
+      sellingPrice: body.sellingPrice || 0,
+      userId: decoded.id
     });
-    return ApiResponse(stock).success();
+
+    return ApiResponse(result).success();
   } catch (error) {
-    console.error('Error in POST /api/stocks:', error);
+    console.error('Error in POST /api/farmer/inventory:', error);
     return ErrorException(
       ApiErrorMessage.INTERNAL_SERVER_ERROR.value,
       ApiErrorCode.INTERNAL_SERVER_ERROR.code
     );
   }
 }
-
-export async function GET(req: NextRequest) {
-  try {
-    const token = req.cookies.get(AUTH.COOKIE.NAME)?.value;
-    if (!token) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
-
-    const decoded = verifyToken(token) as JwtPayload;
-    if (!decoded?.id) return ApiResponse(ApiErrorCode.UNAUTHORIZED).error();
-
-    const userId = typeof decoded.id === 'string' ? parseInt(decoded.id) : decoded.id;
-
-    const stocks = await StockService.findByUserId(userId);
-    return ApiResponse(stocks).success();
-  } catch (error) {
-    console.error('Error in GET /api/stocks:', error);
-    return ErrorException(
-      ApiErrorMessage.INTERNAL_SERVER_ERROR.value,
-      ApiErrorCode.INTERNAL_SERVER_ERROR.code
-    );
-  }
-}
-

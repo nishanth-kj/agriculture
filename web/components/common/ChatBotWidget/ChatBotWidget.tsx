@@ -48,7 +48,7 @@ export default function ChatBotWidget() {
           ])
         }
 
-        const soilRes = await fetch('/api/soil', { credentials: 'include', cache: 'no-store' })
+        const soilRes = await fetch('api/farmer/soil', { credentials: 'include', cache: 'no-store' })
         if (soilRes.ok) {
           const soilData = await soilRes.json()
           setSoilData(soilData)

@@ -19,10 +19,10 @@ export * from "@/lib/constants/role";
 export * from "@/lib/constants/seasons";
 export * from "@/lib/constants/states";
 export * from "@/lib/constants/status";
-export * from "@/lib/constants/resource-type";
 export * from "@/lib/constants/weather-options";
 
 // Shared utilities & enums
 export * from "@/lib/enum/base-enum";
 export * from "@/lib/enum/enum-item.type";
 export * from "@/lib/utils";
+export * from "@/lib/models/pagination.model";

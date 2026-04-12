@@ -56,6 +56,9 @@ interface DataTableProps<T> {
   emptyMessage?: string;
   loading?: boolean;
   pageSize?: number;
+  manualPagination?: boolean;
+  totalRecords?: number;
+  onPaginationChange?: (page: number, size: number) => void;
 }
 
 type SortDirection = "asc" | "desc" | null;
@@ -67,6 +70,9 @@ export function DataTable<T>({
   emptyMessage = "No records found.",
   loading = false,
   pageSize = 10,
+  manualPagination = false,
+  totalRecords,
+  onPaginationChange,
 }: DataTableProps<T>) {
   // State management
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,12 +123,30 @@ export function DataTable<T>({
   }, [filteredData, sortColumn, sortDirection]);
 
   // Paginate data
-  const totalPages = Math.ceil(sortedData.length / displayedPageSize);
+  const totalEntries = manualPagination ? (totalRecords ?? data.length) : sortedData.length;
+  const totalPages = Math.ceil(totalEntries / displayedPageSize);
+  
   const paginatedData = useMemo(() => {
+    if (manualPagination) return data;
     const start = (currentPage - 1) * displayedPageSize;
     const end = start + displayedPageSize;
     return sortedData.slice(start, end);
-  }, [sortedData, currentPage, displayedPageSize]);
+  }, [sortedData, data, currentPage, displayedPageSize, manualPagination]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    if (manualPagination && onPaginationChange) {
+      onPaginationChange(page, displayedPageSize);
+    }
+  }, [manualPagination, onPaginationChange, displayedPageSize]);
+
+  const handlePageSizeChange = useCallback((size: number) => {
+    setDisplayedPageSize(size);
+    setCurrentPage(1);
+    if (manualPagination && onPaginationChange) {
+      onPaginationChange(1, size);
+    }
+  }, [manualPagination, onPaginationChange]);
 
   // Handle sort
   const handleSort = useCallback(
@@ -385,11 +409,11 @@ export function DataTable<T>({
             </span>
             -
             <span className="font-semibold text-foreground">
-              {Math.min(currentPage * displayedPageSize, sortedData.length)}
+              {Math.min(currentPage * displayedPageSize, totalEntries)}
             </span>
             of
             <span className="font-semibold text-foreground">
-              {sortedData.length}
+              {totalEntries}
             </span>
           </div>
 
@@ -401,8 +425,7 @@ export function DataTable<T>({
             <Select
               value={displayedPageSize.toString()}
               onValueChange={(value) => {
-                setDisplayedPageSize(Number(value));
-                setCurrentPage(1);
+                handlePageSizeChange(Number(value));
               }}
             >
               <SelectTrigger className="w-16 h-8 text-xs rounded-lg">
@@ -423,7 +446,7 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(1)}
+              onClick={() => handlePageChange(1)}
               disabled={currentPage === 1}
               className="h-8 w-8 p-0 rounded-lg"
               title="First page"
@@ -433,7 +456,7 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className="h-8 w-8 p-0 rounded-lg"
               title="Previous page"
@@ -457,8 +480,8 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages || totalPages === 0}
               className="h-8 w-8 p-0 rounded-lg"
               title="Next page"
             >
@@ -467,8 +490,8 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages || totalPages === 0}
               className="h-8 w-8 p-0 rounded-lg"
               title="Last page"
             >

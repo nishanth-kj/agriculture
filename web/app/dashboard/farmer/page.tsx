@@ -9,11 +9,12 @@ import { FarmerDashboardProps, WeatherData, MarketPriceEntry } from "@/types";
 import dayjs from "dayjs";
 import { toast } from "sonner";
 import { 
-  LayoutDashboard, 
+  LayoutDashboard,
   Package, 
   FlaskConical, 
   Sprout, 
   Bug,
+  Users,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/common/Dashboard/DashboardLayout";
 
@@ -23,7 +24,8 @@ import {
   SoilHealthView,
   CropPredictionView,
   PestPredictionView,
-  ManagingView,
+  InventoryView,
+  WorkersView,
 } from "@/components/dashboard/farmer";
 
 
@@ -160,7 +162,8 @@ export default function FarmerDashboardPage() {
    */
   const sections = [
     { id: "overview", label: "Overview", icon: LayoutDashboard, content: <FarmerOverview stats={stats!} weather={weather} marketPrices={marketPrices} showAllPrices={showAllPrices} setShowAllPrices={setShowAllPrices} onToolSelect={setSelectedSection} /> },
-    { id: "inventory", label: "Inventory", icon: Package, content: <ManagingView initialTab="inventory" hideTabs={false} /> },
+    { id: "inventory", label: "Inventory", icon: Package, content: <InventoryView/> },
+    { id: "work", label: "Workforce", icon: Users, content: <WorkersView/> },
     { id: "soil", label: "Soil Health", icon: FlaskConical, content: <SoilHealthView /> },
     { id: "crop", label: "Crop AI", icon: Sprout, content: <CropPredictionView /> },
     { id: "pest", label: "Pest Forecast", icon: Bug, content: <PestPredictionView /> },

@@ -11,7 +11,7 @@ const bytea = customType<{ data: Buffer }>({
 export const user = pgTable("user", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
+  email: text("email").unique(),
   name: text("name").notNull(),
   password: text("password").notNull(),
   phone: text("phone"),

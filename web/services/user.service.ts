@@ -126,14 +126,19 @@ export class UserService {
     /**
      * Authentication Logic: Registration
      */
-    static async register(userData: { email: string, password: string, name: string, username?: string, roleName?: string }) {
-        const existingUser = await this.findByIdentifier(userData.email);
+    static async register(userData: { email?: string, password: string, name: string, username?: string, roleName?: string, parentUserId?: number }) {
+        const identifier = userData.email || userData.username;
+        if (!identifier) {
+            throw new ValidationException(ApiErrorCode.MISSING_FIELDS);
+        }
+
+        const existingUser = await this.findByIdentifier(identifier);
         if (existingUser) {
-            throw new ValidationException(ApiErrorCode.EMAIL_IN_USE);
+            throw new ValidationException(userData.email ? ApiErrorCode.EMAIL_IN_USE : ApiErrorCode.USERNAME_IN_USE);
         }
 
         const hashedPassword = await hashPassword(userData.password);
-        const finalUsername = userData.username || userData.email.split('@')[0] + Math.floor(Math.random() * 1000);
+        const finalUsername = userData.username || (userData.email ? userData.email.split('@')[0] : 'user') + Math.floor(Math.random() * 1000);
 
         return await db.transaction(async (tx) => {
             const [newUser] = await tx.insert(user).values({
@@ -141,6 +146,7 @@ export class UserService {
                 password: hashedPassword,
                 name: userData.name,
                 username: finalUsername,
+                parentUserId: userData.parentUserId,
                 status: STATUS.ACTIVE.code
             }).returning();
 
@@ -157,7 +163,7 @@ export class UserService {
 
             const token = generateToken({
                 id: newUser.id,
-                email: newUser.email,
+                email: newUser.email || undefined,
                 role: targetRoleName,
             });
 

@@ -11,8 +11,7 @@ export const api = (url: string, payload: unknown = {}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ...(payload as Record<string, unknown>),
-        _method: method // Pass the intended method for legacy/logging purposes
+        ...(payload as Record<string, unknown>)
       }),
     };
 
@@ -42,7 +41,7 @@ export const api = (url: string, payload: unknown = {}) => {
       throw new Error(result.error?.message || 'API Error');
     }
 
-    return result.data;
+    return result;
   };
 
   return {
