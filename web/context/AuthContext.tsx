@@ -3,10 +3,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api } from '@/lib/api/apiclient';
 import { useRouter } from 'next/navigation';
-
+import { RegisterPayload, LoginPayload } from '@/types';
 import { User, AuthContextType } from '@/types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -29,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initAuth();
     }, []);
 
-    const login = async (credentials: unknown) => {
+    const login = async (credentials: Record<string, unknown>) => {
         try {
             const res = await api('api/auth/login', credentials).post();
             if (res?.data) {
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (data: unknown) => {
+    const register = async (data: RegisterPayload) => {
         try {
             const res = await api('/api/auth/register', data).post();
             if (res?.data) {
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login: login as (credentials: unknown) => Promise<void>, register : register as (data: RegisterPayload) => Promise<void>, logout }}>
             {children}
         </AuthContext.Provider>
     );

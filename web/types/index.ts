@@ -41,6 +41,8 @@ export * from "@/types/request/pest-form-data.type";
 export * from "@/types/request/pest-prediction-request.type";
 export * from "@/types/request/soil-health-input.type";
 export * from "@/types/request/worker-form.type";
+export * from "@/types/request/login-request.type";
+export * from "@/types/request/register-request.type";
 
 // Response (API Response Payloads)
 export * from "@/types/response/action-response.type";
