@@ -17,7 +17,7 @@ import {
   Cpu,
 } from "lucide-react";
 import { FaUserSecret, FaGlobe, FaChartBar } from "react-icons/fa";
-import { AdminDashboardProps, RoleStat } from "@/types";
+import { AdminDashboardProps, RoleStat, ROLE } from "@/types";
 
 export default function Overview({ stats }: { stats: AdminDashboardProps["stats"] }) {
   if (!stats) return null;
@@ -63,9 +63,9 @@ export default function Overview({ stats }: { stats: AdminDashboardProps["stats"
               {stats.roleDistribution.map((role: RoleStat) => (
                 <div key={role.name} className="flex flex-col items-center p-4 rounded-lg border bg-muted/30 hover:bg-accent transition-colors text-center group">
                   <div className="p-3 bg-background rounded-md mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    {role.name === "ADMIN" && <FaUserSecret size={20} />}
-                    {role.name === "FARMER" && <FaGlobe size={20} />}
-                    {role.name === "WORKER" && <FaChartBar size={20} />}
+                    {role.name === ROLE.ADMIN.value && <FaUserSecret size={20} />}
+                    {role.name === ROLE.FARMER.value && <FaGlobe size={20} />}
+                    {role.name === ROLE.WORKER.value && <FaChartBar size={20} />}
                   </div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{role.name}</p>
                   <p className="text-3xl font-bold">{role.count}</p>

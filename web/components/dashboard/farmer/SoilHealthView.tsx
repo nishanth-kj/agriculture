@@ -73,7 +73,7 @@ export default function SoilHealthView() {
       const payload = Object.fromEntries(
         requiredFields.map((key) => [key, parseFloat(formData[key]!)]),
       );
-      const result = await api("/api/farmer/soil", payload).post();
+      const result = await api("api/farmer/soil", payload).post();
       if (result) {
         setFormData((prev) => ({ ...prev, ...result }));
         toast.success("Soil Analysis Complete!");

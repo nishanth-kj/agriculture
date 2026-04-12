@@ -216,7 +216,7 @@ export function DataTable<T>({
             setSearchQuery(e.target.value);
             setCurrentPage(1);
           }}
-          className="flex-1 h-9 rounded-lg"
+          className="max-w-xs h-9 rounded-lg"
         />
         {searchQuery && (
           <Button
@@ -232,16 +232,18 @@ export function DataTable<T>({
           </Button>
         )}
 
+        <div className="flex-1" />
+
         {/* Column Visibility Toggle */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="h-9 w-9 p-0 rounded-lg"
+              className="h-9 w-9 p-0 rounded-lg shadow-sm hover:shadow-md transition-all"
               title="Toggle column visibility"
             >
-              <Settings className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-56 p-3">

@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ResourceManagement,
-  Resource,
-} from "@/components/common/ResourceManagement";
+import { ResourceManagement } from "@/components/common/ResourceManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Users } from "lucide-react";
+import { Resource, RESOURCE_TYPE } from "@/types";
 
 export function ResourceDashboard() {
   const [inventoryData] = useState<Resource[]>([]);
@@ -61,7 +59,7 @@ export function ResourceDashboard() {
         {/* Inventory Tab */}
         <TabsContent value="inventory" className="space-y-4">
           <ResourceManagement
-            type="inventory"
+            type={RESOURCE_TYPE.INVENTORY.code}
             title="Inventory Management"
             description="Manage farm equipment, seeds, fertilizers, and other inventory items."
             initialData={inventoryData}
@@ -73,7 +71,7 @@ export function ResourceDashboard() {
         {/* Labour Tab */}
         <TabsContent value="labour" className="space-y-4">
           <ResourceManagement
-            type="labour"
+            type={RESOURCE_TYPE.LABOUR.code}
             title="Labour Management"
             description="Manage farm workers and labour resources."
             initialData={labourData}

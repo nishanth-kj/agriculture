@@ -31,6 +31,8 @@ export * from "@/types/interfaces/stock";
 export * from "@/types/interfaces/user-role";
 export * from "@/types/interfaces/user";
 export * from "@/types/interfaces/worker";
+export * from "@/types/interfaces/resource";
+export * from "@/types/interfaces/resource-form-data";
 
 // Request (API Request Payloads)
 export * from "@/types/request/chat-request.type";
@@ -50,6 +52,8 @@ export * from "@/types/response/pagination.type";
 export * from "@/types/response/pest-prediction-response.type";
 export * from "@/types/response/pest-prediction-result.type";
 export * from "@/types/response/prediction-response.type";
+export * from "@/types/response/inventory-api-item.type";
+export * from "@/types/response/worker-api-item.type";
 
 // Result (Computation/Chat Output)
 export * from "@/types/result/chatbot-message.type";
@@ -68,7 +72,10 @@ export * from "./props/dashboard/soil-health-props.type";
 export * from "./props/dashboard/crop-prediction-props.type";
 export * from "./props/dashboard/pest-prediction-props.type";
 export * from "@/types/props/dashboard/managing-page-props.type";
+export * from "@/types/props/resource-management-props.type";
 export * from "@/types/props/price.type";
 
 // Constants (Exposed via types for convenience)
 export { ROLE } from "@/lib/constants/role";
+export { RESOURCE_TYPE } from "@/lib/constants/resource-type";
+export { STATUS } from "@/lib/constants/status";

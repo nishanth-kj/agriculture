@@ -19,6 +19,7 @@ export * from "@/lib/constants/role";
 export * from "@/lib/constants/seasons";
 export * from "@/lib/constants/states";
 export * from "@/lib/constants/status";
+export * from "@/lib/constants/resource-type";
 export * from "@/lib/constants/weather-options";
 
 // Shared utilities & enums
